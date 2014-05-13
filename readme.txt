@@ -88,7 +88,7 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Upgrade Notice ==
 
-= 0.6.03 =
+= 0.6.04 =
 Upgrade for GPLv2 license and Affinitomics™ Cloud storage.
 
 = 0.5.04 =
