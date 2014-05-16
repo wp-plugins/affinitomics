@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: ignitriun, joewils
 Donate link: http://prefrent.com/
-Tags: tags, related posts, ai, context, contextual, intelligent, jump-search, knowledge
+Tags: tags, related posts, ai, a.i., filter, micro format, context, contextual, search, knowledge, knowledge-base, data, freeform, construct, descriptors, draws, distance, svm
 Requires at least: 3.6
-Tested up to: 3.9
-Stable tag: 0.6.04
+Tested up to: 3.9.1
+Stable tag: 0.6.05
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,11 +26,10 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. Either use the upload link provided within WordPress’ “add new” plugin page (the link reads “upload a plugin in .zip format via this page. or;
 1. Upload the plugin directory “affinitomics” to your /wp-content/plugins/ directory
 1. Activate the plugin through the Plugins menu in WordPress
-1. Go to “Archetypes” in the left hand control menu
+1. Go to “Affinitomics™” in the left hand control menu
 1. Select “settings” from the bottom of the list
 1. Generate and input an Affinitomics™ API key. Save this key someplace secure – it can’t be retrieved. You can use the link in the plugin, or you can get it here
 1. Configure Affintomics™ for your site. If you intend to use Jumpsearch, follow the links to obtain free API / Search credentials from Google.
-1. If you already have tags attached to your posts or pages, and you’ll be using Affinitomics with these post types, you can check “categories / tags to Affinitomics,” save your settings, and then select “Cloud Export” from the “Archetypes” menu, check “make it so!” and click export. This will create Affinitomics™ for your existing post types.
 
 == Frequently Asked Questions ==
 
@@ -51,6 +50,8 @@ for Jump-search functionality, credentials are required form Google as well.
 2. This shows the descriptor, draw, and distance fields and how they are utilized.
 
 == Changelog ==
+=0.6.05=
+Corrections in readme.txt and documentation
 
 =0.6.04=
 * Changed Archetype to Affinitomics in admin menu per user suggestions
@@ -88,8 +89,8 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Upgrade Notice ==
 
-= 0.6.04 =
-Upgrade for GPLv2 license and Affinitomics™ Cloud storage.
+= 0.6.05 =
+Changes to instructions, tags
 
 = 0.5.04 =
 This version is Commercial-to-GPL License
