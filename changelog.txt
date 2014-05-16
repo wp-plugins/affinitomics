@@ -1,47 +1,40 @@
 Plugin Name: Affinitomics
 Author: Joe Wilson, Rob Hust (Prefrent).
 
-Change Log:
-----------------------------------------------------------------------
-----------------------------------------------------------------------
+== Changelog ==
+=0.6.05=
+Corrections in readme.txt and documentation
 
-0.6.04
-----------------------------------------------------------------------
-- Changed Archetype to Affinitomics in admin menu per user suggestions
-- Cleaned up legacy and simplified UI
-- Submitted title screen
+=0.6.04=
+* Changed Archetype to Affinitomics in admin menu per user suggestions
+* Cleaned up legacy and simplified UI
+* Submitted title screen
 
-0.6.03
-----------------------------------------------------------------------
-- Added link in settings to generate API key
-- Added changelog.txt to the plugin
-- other little bug fixes/improvements
+= 0.6.03 =
+* Added link in settings to generate API key
+* Added changelog.txt to the plugin
+* other little bug fixes/improvements
 
+= 0.6.02 =
+* GPLv2 License
+* Enabled shortcodes for limit, category, override
+* fixed bug displaying deleted post-types
+* other little bug fixes/improvements
 
-0.6.02
-----------------------------------------------------------------------
-- GPLv2 License
-- Enabled shortcodes for limit, category, override
-- fixed bug displaying deleted post-types
-- other little bug fixes/improvements
+= 0.6.01 =
+* Fixed google CSE implementation
+* Added API key and API key generation
+* other little bug fixes/improvements
 
-0.6.01 - 4/25/2014
-----------------------------------------------------------------------
-- Fixed google CSE implementation
-- Added API key and API key generation
-- other little bug fixes/improvements
+= 0.6.00 =
+* Interface via API with Affinitomics™ Proxy Server - storing Affinitomics in the Cloud.
+* Added cloud export feature
+* Deleted base scoring from pluggin - no longer relies on the Wordpress host machne for calculation or indexing
+* other little bug fixes/improvements
 
-0.6.00 - 4/15/2014
-----------------------------------------------------------------------
-- Interface via API with Affinitomics™ Proxy Server - storing Affinitomics in the Cloud.
-- Added cloud export feature
-- Deleted base scoring from pluggin - no longer relies on the Wordpress host machne for calculation or indexing
-- other little bug fixes/improvements
-
-0.5.04 - 3/27/2012
-----------------------------------------------------------------------
-- Limited public beta
-- Commercial-to-GPL License
-- Fixed Multisite retrieval issue
-- Increased element limitation
-- other little bug fixes/improvements
+= 0.5.04 =
+* Limited public beta
+* Commercial-to-GPL License
+* Fixed Multisite retrieval issue
+* Increased element limitation
+* other little bug fixes/improvements

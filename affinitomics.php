@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.6.04 Beta
+Version: 0.6.05 Beta
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -170,7 +170,7 @@ function afpost_save_postdata( $post_id ) {
       'uid' => $post_ID,
       'category' => $cat_string
     );
-    if ($afid) $affinitomics['afid'] = $afid; 
+    if ($afid) $affinitomics['afid'] = $afid;
     $af_cloud_url = get_option('af_cloud_url');
     $request = curl_request($af_cloud_url.'/v1/post/affinitomics/', $affinitomics);
     $af = json_decode($request, true);
@@ -364,14 +364,14 @@ function afview_function($atts) {
   $af_domain = get_option('af_domain');
   $af_key = get_option('af_key');
 
-  // Find Related Elements    
+  // Find Related Elements
   if ($afid) {
     $af_cloud_url = get_option('af_cloud_url');
     $af_cloud = $af_cloud_url.'/v1/related/affinitomics/?afid='.$afid.'&domain='.$af_domain.'&key='.$af_key;
     if ($affinitomics) {
       $af_cloud = $af_cloud . '&af=' . rawurlencode($affinitomics);
     }
-    $request = file_get_contents($af_cloud, false); 
+    $request = file_get_contents($af_cloud, false);
     $af = json_decode($request, true);
     $afview_output .= '<!-- '.$af_cloud.' -->';
   }
@@ -437,7 +437,7 @@ function af_plugin_menu() {
   // Add Custom Sub Menus
   add_submenu_page( 'edit.php?post_type=archetype', 'Settings', 'Settings', 'manage_options', 'affinitomics', 'af_plugin_options');
   add_action( 'admin_init', 'af_register_settings' );
-  add_submenu_page( 'edit.php?post_type=archetype', 'Cloud Export', 'Cloud Export', 'manage_options', 'afcloudify', 'af_plugin_export'); 
+  add_submenu_page( 'edit.php?post_type=archetype', 'Cloud Export', 'Cloud Export', 'manage_options', 'afcloudify', 'af_plugin_export');
 }
 /*
 Affinitomics Commercial Code
@@ -485,7 +485,7 @@ function af_plugin_export() {
       );
       if ($affinitomics['descriptors'] || $affinitomics['draw'] || $affinitomics['distance']) {
         $af_cloud_url = get_option('af_cloud_url');
-        $request = curl_request($af_cloud_url.'/v1/post/affinitomics/', $affinitomics); 
+        $request = curl_request($af_cloud_url.'/v1/post/affinitomics/', $affinitomics);
         $af = json_decode($request, true);
         echo '<li>';
         print_r($request);
@@ -795,10 +795,10 @@ End Affinitomics Commercial Code
 // CURL Request Function
 function curl_request($url,$postdata=false) {
   $ch = curl_init();
-  curl_setopt($ch, CURLOPT_HEADER, false); 
+  curl_setopt($ch, CURLOPT_HEADER, false);
   curl_setopt($ch, CURLINFO_HEADER_OUT, false);
   curl_setopt($ch, CURLOPT_VERBOSE, false);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);     
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_URL, $url);
   if ($postdata) {
     //urlify the data for the POST

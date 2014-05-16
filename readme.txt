@@ -50,8 +50,9 @@ for Jump-search functionality, credentials are required form Google as well.
 2. This shows the descriptor, draw, and distance fields and how they are utilized.
 
 == Changelog ==
+
 =0.6.05=
-Corrections in readme.txt and documentation
+* Corrections in readme.txt and documentation
 
 =0.6.04=
 * Changed Archetype to Affinitomics in admin menu per user suggestions
