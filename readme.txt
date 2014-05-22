@@ -46,7 +46,7 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. Ensure that the post types are selected
 1. Under “Jump Search select “yes” to apply the Google CSE “JumpSearch” to posts or pages
 1. Follow the links to obtain free API / Search credentials from Google.
-1. For your Google API Key (separate from your Affinitomics API key above) follow the instructions here ]https://cloud.google.com/console](https://cloud.google.com/console)
+1. For your Google API Key (separate from your Affinitomics API key above) follow the instructions here [https://cloud.google.com/console](https://cloud.google.com/console)
 1. For your Google Custom Search Engine (CSE) ID follow the instructions here [https://developers.google.com/custom-search/](https://developers.google.com/custom-search/)
 
 = NOTE: Existing pages and posts (rather, the Affinitomics placed on them) must be exported to the Affinitomics cloud before any of them will work. = 
