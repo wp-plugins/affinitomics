@@ -31,9 +31,6 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. Generate and input an Affinitomics™ API key. Save this key someplace secure – it can’t be retrieved. You can use the link in the plugin, or you can get it here
 1. Configure Affintomics™ for your site. If you intend to use JumpSearch
 
-
-== Configuration ==
-
 = Configure Affinitomics =
 1. Install the plugin
 1. In the admin panel, find the “Affinitomics” menu (usually below Posts) and select “settings”
