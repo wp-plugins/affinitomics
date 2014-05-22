@@ -4,7 +4,7 @@ Donate link: http://prefrent.com/
 Tags: tags, related posts, ai, a.i., filter, micro format, context, contextual, search, knowledge, knowledge-base, data, freeform, construct, descriptors, draws, distance, svm
 Requires at least: 3.6
 Tested up to: 3.9.1
-Stable tag: 0.6.05
+Stable tag: 0.6.06
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,13 +23,47 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 == Installation ==
 
 1. Download the plugin.
-1. Either use the upload link provided within WordPress’ “add new” plugin page (the link reads “upload a plugin in .zip format via this page. or;
-1. Upload the plugin directory “affinitomics” to your /wp-content/plugins/ directory
-1. Activate the plugin through the Plugins menu in WordPress
-1. Go to “Affinitomics™” in the left hand control menu
-1. Select “settings” from the bottom of the list
+1. Either use the “add new plugin” functionality internal to Wordpress.org in your “Plugins” menu or;
+1. Upload the plugin directory “affinitomics” to your /wp-content/plugins/ directory.
+1. Activate the plugin through the Plugins menu in WordPress.
+1. Go to “Affinitomics™” in the left hand control menu.
+1. Select “settings” from the bottom of the list.
 1. Generate and input an Affinitomics™ API key. Save this key someplace secure – it can’t be retrieved. You can use the link in the plugin, or you can get it here
-1. Configure Affintomics™ for your site. If you intend to use Jumpsearch, follow the links to obtain free API / Search credentials from Google.
+1. Configure Affintomics™ for your site. If you intend to use JumpSearch
+
+
+== Configuration ==
+
+= Configure Affinitomics =
+1. Install the plugin
+1. In the admin panel, find the “Affinitomics” menu (usually below Posts) and select “settings”
+1. Make sure that the field for “Affinitomics™ API URL” contains “http://data.prefrent.com”
+1. Now you’ll need an API key - in a separate browser window, go to “http://prefrent.com/get-api-key/“ - put in the domain name of your site without the http://, example subdomain.domain.com or domain.com/my-site. This and your email address register the API key for your site. 
+1. From the resulting page, copy the API key and API domain to the API Key and Domain fields in your settings.
+1. Next, under “To which Post-types would you like to apply your Affinitomics™?” check the boxes for the post-types you want to use with Affinitomics.
+1. Now scroll to the bottom and save changes. Unless you want to configure Google Custom Search (CSE) to work with Affinitomics, you’re done.
+
+= Configure Google CSE integration =
+1. In the admin panel, find the “Affinitomics” menu and select “settings”
+1. Ensure that the settings for the API URL, API Key, and API Account Domain are configured
+1. Ensure that the post types are selected
+1. Under “Jump Search select “yes” to apply the Google CSE “JumpSearch” to posts or pages
+1. Follow the links to obtain free API / Search credentials from Google.
+1. For your Google API Key (separate from your Affinitomics API key above) follow the instructions here ]https://cloud.google.com/console](https://cloud.google.com/console)
+1. For your Google Custom Search Engine (CSE) ID follow the instructions here [https://developers.google.com/custom-search/](https://developers.google.com/custom-search/)
+
+= NOTE: Existing pages and posts (rather, the Affinitomics placed on them) must be exported to the Affinitomics cloud before any of them will work. = 
+1. Under the Affinitomics menu choose “Cloud Export.”
+2. Check “Make it so” and wait for a bit. It won’t take too long, but we haven’t bothered to give you a spinner yet, sorry. You’ll see an output list when it’s done.
+3. This will only have to be done once, unless you import pages or posts. It’s handled automatically for new pages, posts, and Archetypes.
+
+= Configure individual Posts, Pages, or Archetypes™ =
+1. For existing pages or posts, either copy or move tags to the “Descriptors” field in the page or post editor. 
+1. If you want like objects to attract like objects in your system, copy the tags to both “Descriptors” and “Draw”.
+1. It is a best practice (not a requirement) to include a Descriptor of Person, Place, Thing, Concept or Construct in the Descriptors, especially if the Affinitomics are to be exported later, and shared.
+1. Draws are preceded by a plus “+” sign and can be followed by a number from 1 to 5; the greater the draw, the greater the number. If there is no number, it’s value is considered to be “1”. Example; +dogs5 is the highest preference for dogs possible.
+1. If a Distance is indicated, it is done in the same manner as a draw; -dogs5 (notice that it is preceded by a minus, “-“ and not a plus, “+”. An attenuation of “5” indicates the highest possible dislike. If there is no number, it’s value is considered to be “1”.
+1. If none of the Affinitomic™ Element fields are filled in, the page, post, or Archetype will not be effected by Affinitomics™ - JumpSearch will have no effect, and only shortcodes with overriding Affinitomics™ will function.
 
 == Frequently Asked Questions ==
 
@@ -40,7 +74,12 @@ Affinitomics™ requires Wordpress 3.5 or better, and php 5.3 or better.
 = How much storage do I get in the Affinitomics™ Cloud =
 
 Users are granted space for 1000 Affinitomic™ constructs and transactions of 50,000 pageviews per month.
-Larger accounts are available at [Prefrent.com](http://prefrent.com).
+Larger accounts are available at [Prefrent.com](http://prefrent.com). 
+
+= How many “Archetypes” will I need? =
+An Affinitomic Archetype can be applied to a post, page, custom post-type, or archetype (Affinitomics’™ custom post type)
+So 1000 archetypes could be 50 pages, 900 posts, and 50 ads if you didn’t assign individual Archetypes to members.
+
 
 == Screenshots ==
 
@@ -49,12 +88,16 @@ for Jump-search functionality, credentials are required form Google as well.
 
 2. This shows the descriptor, draw, and distance fields and how they are utilized.
 
+3. This is a list of Investment firms sorted by Prefrent’s Archetype - All of them have a history of investing in companies very like ours.
+
+4. This is a JumpSearch from a “Cheese Shop” Archetype, searching for “hat.”
+
 == Changelog ==
 
-=0.6.05=
+= 0.6.05 =
 * Corrections in readme.txt and documentation
 
-=0.6.04=
+= 0.6.04 =
 * Changed Archetype to Affinitomics in admin menu per user suggestions
 * Cleaned up legacy and simplified UI
 * Submitted title screen
@@ -78,7 +121,7 @@ for Jump-search functionality, credentials are required form Google as well.
 = 0.6.00 =
 * Interface via API with Affinitomics™ Proxy Server - storing Affinitomics in the Cloud.
 * Added cloud export feature
-* Deleted base scoring from pluggin - no longer relies on the Wordpress host machne for calculation or indexing
+* Deleted base scoring from plugin - no longer relies on the Wordpress host machine for calculation or indexing
 * other little bug fixes/improvements
 
 = 0.5.04 =
@@ -90,8 +133,50 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Upgrade Notice ==
 
+= 0.6.06 =
+Esthetic bug fixes, changes to configuration instructions (Thanks for the awesome feedback - videos soon)
+
 = 0.6.05 =
-Changes to instructions, tags
+Changes to instructions, tags, API key
+
+= 0.6.02 =
+GPLv2 License, changes to JSON objects and API
 
 = 0.5.04 =
-This version is Commercial-to-GPL License
+Limited public beta, Commercial-to-GPL License
+
+== Additional Information ==
+
+Affinitomics vs Tags [also here](http://prefrent.com/affinitomics-u-affinitomics-vs-tags/)
+
+“Affinitomics™ sounds intimidating – It must take lots of training or a PhD to comprehend.” This couldn’t be further from the truth. If you know how tags work, you can use Affinitomics. Skim this article, and you’ll understand Affinitomics and know how to use them. And we promise, no classes, no visits to MIT, and no scientists are required.
+
+When people tag documents or web pages, they generally put everything deemed pertinent into the tags. And since search engines rely on these tags, people involved in search engine optimization often attach quite a number of tags and keywords to the document. These tags – all stored in the same place and separated by commas – are what scientists call a “bag-of-words” or “bag-of-features.” They call them that because there is no structure to the meta-data that the tags provide. Scientists also call this “flat” because all the tags have the same value, and are all used the same way. When a page is searched, the search algorithm usually awards the tags and keywords a higher value if they are also found within the structure of the document. This is called concordance. In the world of intelligent systems, concordance is barely a passing grade. It’s ok for sorting a response from a search engine, but not much else.
+
+Affinitomics™ makes a simple change to this paradigm – the same tags are simply sorted based on their relationship to the subject matter of the document (or picture, or video, or song, etc.). This simple change makes a world of difference. It changes tags from a “bag-of-words” to a “dimensional feature space” – making them much more valuable and useful to any number of machine learning and artificial intelligence algorithms.
+
+How are the tags sorted? That’s a good question with a deceptively simple answer. If you look at any set of tags you’ll discover that there are usually two, and sometimes three types.
+
+1) Some tags describe the subject’s particular features; 2) some describe what the subject goes with or occurs with; and, 3) sometimes, there are tags that describe what the subject doesn’t go with, conflicts with, or dislikes.
+By dividing these tags into Descriptors (what it is), Draws (as in drawing closer), and Distances (as in keeping a distance from), the feature space becomes multi-dimensional, thus imparting more information for sorting and classification algorithms. Essentially this makes information self-aware – understanding what it is, what it matches, and what it doesn’t match or is antithetical to. As an example, the following are tags for a St. Bernard Dog: dog, big, k9, furry, eats a lot, good with kids, likes snow, chases cars, chases cats.
+
+It’s easy to derive Affinitomics from these tags. “dog, big, k9, furry” are all easily recognizable as Descriptors. The Draws are easy to recognize as well, and we can take a shortcut in writing them that will differentiate them from Descriptors. They become: +eating, +kids, +snow. We also take a shortcut on what are easy to spot as Distances, and they become: -cars, -cats. By separating the tags into three types of Affinitomics, not only have they become more useful for the computer system, they are actually easier to write and take up less space.
+
+Traditional Tags look like this: 
+= dog, big, k9, furry, eats a lot, good with kids, likes snow, chases cars, chases cats =
+
+Whereas the features in an Affinitomic Archetype look like this: 
+= dog, big, k9, furry, +eating, +kids, +snow, -cars, -cats =
+
+So now you know how to write Affinitomics, you can see that it takes much less time than writing tags, and by categorizing tags into Descriptors, Draws and Distances, you’ve made the computer much happier.  
+
+= It’s like sorting laundry – it takes the same amount of time and results come out in the wash. With these Affinitomics instead of tags, algorithms can much more quickly determine matches, affinities, and sort values. =
+
+= Extra Credit =
+
+Affinitomics are even more valuable with attenuation – telling the system how much to value Draws and Distances. For example: How much does the dog like to eat?  Or which does it hate more; cars or cats? The attenuated Affinitomics for the St. Bernard answer those questions like this: 
+= dog, big, k9, furry, +eating2, +kids, +snow4, -cars2, -cats5 =
+
+You’ll notice that it’s still less data than the tags, even though the Affinitomics now represent a three dimensional feature space which is far more valuable for knowledge retrieval, discovery, and machine learning. Because of this, Affinitomics can be evaluated, sorted, and grouped much faster and more accurately than tags. In addition, since the Affinitomics essentially make the information self-ranking and self-sorting, systems that use Affinitomics don’t require categories. 
+
+There you have it. You now know how to create Affinitomic Archetypes – a fancy way of saying that you understand how and why you should sort your laundry, errr, tags.

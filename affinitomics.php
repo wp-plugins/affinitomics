@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.6.05 Beta
+Version: 0.6.06 Beta
 Author: Prefrent
 Author URI: http://prefrent.com
 */
