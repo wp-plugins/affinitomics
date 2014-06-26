@@ -66,6 +66,7 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. If none of the Affinitomic™ Element fields are filled in, the page, post, or Archetype will not be effected by Affinitomics™ - JumpSearch will have no effect, and only shortcodes with overriding Affinitomics™ will function.
 
 =Use the following class' to style [afview] display=
+
 * afview
 * aftitle
 * afsubtitle
