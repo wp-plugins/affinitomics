@@ -65,14 +65,14 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. If a Distance is indicated, it is done in the same manner as a draw; -dogs5 (notice that it is preceded by a minus, “-“ and not a plus, “+”. An attenuation of “5” indicates the highest possible dislike. If there is no number, it’s value is considered to be “1”.
 1. If none of the Affinitomic™ Element fields are filled in, the page, post, or Archetype will not be effected by Affinitomics™ - JumpSearch will have no effect, and only shortcodes with overriding Affinitomics™ will function.
 
-=Use the following class' to style [afview] display=
+=Use the following class' to style afview (shortcode) display=
 
-* afview
-* aftitle
-* afsubtitle
-* afelement
-* afelementurl
-* afelementscore
+- afview
+- aftitle
+- afsubtitle
+- afelement
+- afelementurl
+- afelementscore
 
 == Frequently Asked Questions ==
 
