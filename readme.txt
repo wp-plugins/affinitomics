@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: ignitriun, joewils
 Donate link: http://prefrent.com/
-Tags: tags, related posts, ai, a.i., filter, micro format, context, contextual, search, knowledge, knowledge-base, data, freeform, construct, descriptors, draws, distance, svm
+Tags: match, sort, rank, related, relational, relate, tags, posts, post-types, types, ai, a.i., filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, 
 Requires at least: 3.6
 Tested up to: 3.9.1
-Stable tag: 0.6.06
+Stable tag: 0.7.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,6 +32,7 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. Configure Affintomics™ for your site. If you intend to use JumpSearch
 
 = Configure Affinitomics =
+
 1. Install the plugin
 1. In the admin panel, find the “Affinitomics” menu (usually below Posts) and select “settings”
 1. Make sure that the field for “Affinitomics™ API URL” contains “http://data.prefrent.com”
@@ -41,6 +42,7 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. Now scroll to the bottom and save changes. Unless you want to configure Google Custom Search (CSE) to work with Affinitomics, you’re done.
 
 = Configure Google CSE integration =
+
 1. In the admin panel, find the “Affinitomics” menu and select “settings”
 1. Ensure that the settings for the API URL, API Key, and API Account Domain are configured
 1. Ensure that the post types are selected
@@ -55,12 +57,21 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 3. This will only have to be done once, unless you import pages or posts. It’s handled automatically for new pages, posts, and Archetypes.
 
 = Configure individual Posts, Pages, or Archetypes™ =
+
 1. For existing pages or posts, either copy or move tags to the “Descriptors” field in the page or post editor. 
 1. If you want like objects to attract like objects in your system, copy the tags to both “Descriptors” and “Draw”.
 1. It is a best practice (not a requirement) to include a Descriptor of Person, Place, Thing, Concept or Construct in the Descriptors, especially if the Affinitomics are to be exported later, and shared.
 1. Draws are preceded by a plus “+” sign and can be followed by a number from 1 to 5; the greater the draw, the greater the number. If there is no number, it’s value is considered to be “1”. Example; +dogs5 is the highest preference for dogs possible.
 1. If a Distance is indicated, it is done in the same manner as a draw; -dogs5 (notice that it is preceded by a minus, “-“ and not a plus, “+”. An attenuation of “5” indicates the highest possible dislike. If there is no number, it’s value is considered to be “1”.
 1. If none of the Affinitomic™ Element fields are filled in, the page, post, or Archetype will not be effected by Affinitomics™ - JumpSearch will have no effect, and only shortcodes with overriding Affinitomics™ will function.
+
+=Use the following class' to style [afview] display=
+* afview
+* aftitle
+* afsubtitle
+* afelement
+* afelementurl
+* afelementscore
 
 == Frequently Asked Questions ==
 
@@ -91,7 +102,15 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Changelog ==
 
-= 0.6.05 =
+=0.7.0=
+* CSS Styling hooks!
+* Support for WooCommerce!
+
+=0.6.06=
+* Changes to internal documentation
+* Other little bug fixes/improvements
+
+=0.6.05=
 * Corrections in readme.txt and documentation
 
 = 0.6.04 =
@@ -130,17 +149,8 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Upgrade Notice ==
 
-= 0.6.06 =
-Esthetic bug fixes, changes to configuration instructions (Thanks for the awesome feedback - videos soon)
-
-= 0.6.05 =
-Changes to instructions, tags, API key
-
-= 0.6.02 =
-GPLv2 License, changes to JSON objects and API
-
-= 0.5.04 =
-Limited public beta, Commercial-to-GPL License
+= 0.7.0 =
+Upgrade - GPLv2 license, Affinitomics™ Cloud storage, CSS Styling hooks, WooCommerce Support.
 
 == Additional Information ==
 

@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.6.06 Beta
+Version: 0.7.00
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -49,6 +49,7 @@ $screens = array();
 if (get_option('af_post_type_affinitomics','true') == 'true') $screens[] = 'archetype';
 if (get_option('af_post_type_posts','false') == 'true') $screens[] = 'post';
 if (get_option('af_post_type_pages','false') == 'true') $screens[] = 'page';
+if (get_option('af_post_type_products','false') == 'true') $screens[] = 'product';
 
 /* Add Affinitomic Elements to Post and Page edit screens */
 function afpost_add_custom_box() {
@@ -76,7 +77,7 @@ function afpost_inner_custom_box( $post ) {
 
   // Get POST Count
   $count_posts = wp_count_posts();
-  if ($count_posts->publish > 1000) {
+  if ($count_posts->publish > 10000) {
 
     echo '<h1>Affinitomic License Exceeded.</h1>';
     echo '<p>Please Contact Prefrent For Expanded Post Coverage.</p>';
@@ -358,7 +359,7 @@ function afview_function($atts) {
   ), $atts ) );
 
   // Start output
-  $afview_output = '';
+  $afview_output = '<div class="afview">';
   $post_id = get_the_ID();
   $afid = get_post_meta($post_id, 'afid', true);
   $af_domain = get_option('af_domain');
@@ -373,20 +374,41 @@ function afview_function($atts) {
     }
     $request = file_get_contents($af_cloud, false);
     $af = json_decode($request, true);
-    $afview_output .= '<!-- '.$af_cloud.' -->';
+    //$afview_output .= '<!-- '.$af_cloud.' -->';
   }
   // HTML Output
+  /*
+  <div class="afview">
+    <h2 class="aftitle">
+      Related Items: +foo, -bar <i class="afsubtitle">(sorted by Affinitomic concordance)</i>
+    </h2>
+    <ul class="aflist">
+      <li class="afelement">
+        <a href="http://localhost/WordPress/?p=2" class="afelementurl">
+          <span class="afelementtitle">Foo!</span>
+        </a>
+        <span class="afelementscore">(1)</span>
+      </li>
+      <li class="afelement">
+        <a href="http://localhost/WordPress/?p=3" class="afelementurl">
+          <span class="afelementtitle">Foo Bar!</span>
+        </a>
+        <span class="afelementscore">(0)</span>
+      </li>
+    </ul>
+  </div>
+  */
   if ($af['list']) {
     if ($display_title == 'true') {
       if ($affinitomics) {
-        $afview_output .= '<h2>Related Items: '. $affinitomics;
+        $afview_output .= '<h2 class="aftitle">Related Items: '. $affinitomics;
       } else {
-        $afview_output .= '<h2>Related Items: '. $af['list'];
+        $afview_output .= '<h2 class="aftitle">Related Items: '. $af['list'];
       }
-      $afview_output .= ' <i>(sorted by Affinitomic concordance)</i></h2>';
+      $afview_output .= ' <i class="afsubtitle">(sorted by Affinitomic concordance)</i></h2>';
     }
     // Loop Thru Elements
-    $html_list = '<ul>';
+    $html_list = '<ul class="aflist">';
     $html_list_count = 0;
     foreach ($af['related'] as $raf) {
       $process_element = true;
@@ -410,12 +432,12 @@ function afview_function($atts) {
       if ($process_element) {
         if ($html_list_count < $limit) {
           $html_list_count++;
-          $html_list .= '<li><a href="'.$raf['element']['url'].'">'.$raf['element']['title'].'</a> ('.$raf['score'].')</li>';
+          $html_list .= '<li class="afelement"><a href="'.$raf['element']['url'].'" class="afelementurl"><span class="afelementtitle">'.$raf['element']['title'].'</span></a> <span class="afelementscore">('.$raf['score'].')</span></li>';
         }
       }
     }
     $html_list .= '</ul>';
-    $afview_output .= $html_list;
+    $afview_output .= $html_list . '</div>';
   }
   return $afview_output;
 }
@@ -525,7 +547,7 @@ function af_plugin_options() {
   settings_fields( 'af-settings-group' );
   do_settings_sections( 'af-settings-group' );
   $count_posts = wp_count_posts();
-  if ($count_posts->publish > 1000) {
+  if ($count_posts->publish > 10000) {
     echo '<h3>Affinitomic License Exceeded.</h3>';
     echo '<p>Please Contact Prefrent For Expanded Post Coverage.</p>';
     echo '<hr />';
@@ -550,16 +572,20 @@ Affinitomics Commercial Code
   $af_post_type_affinitomics = get_option('af_post_type_affinitomics');
   $af_post_type_posts = get_option('af_post_type_posts');
   $af_post_type_pages = get_option('af_post_type_pages');
+  $af_post_type_products = get_option('af_post_type_products');
   $af_post_type_affinitomics_checked = '';
   $af_post_type_posts_checked = '';
   $af_post_type_pages_checked = '';
+  $af_post_type_products_checked = '';
   if ($af_post_type_affinitomics == 'true') $af_post_type_affinitomics_checked = 'checked="checked"';
   if ($af_post_type_pages == 'true') $af_post_type_pages_checked = 'checked="checked"';
   if ($af_post_type_posts == 'true') $af_post_type_posts_checked = 'checked="checked"';
+  if ($af_post_type_products == 'true') $af_post_type_products_checked = 'checked="checked"';
   echo '<h3>To which Post-types would you like to apply your Affinitomics&trade;?</h3>';
   echo '<input type="checkbox" name="af_post_type_affinitomics" value="true" '.$af_post_type_affinitomics_checked.' /> Affinitomic&trade; Archetypes<br />';
   echo '<input type="checkbox" name="af_post_type_posts" value="true" '.$af_post_type_posts_checked.'/> Posts<br />';
   echo '<input type="checkbox" name="af_post_type_pages" value="true" '.$af_post_type_pages_checked.'/> Pages<br />';
+  echo '<input type="checkbox" name="af_post_type_products" value="true" '.$af_post_type_products_checked.'/> Products<br />';
 
   $af_tag_descriptors = get_option( 'af_tag_descriptors', 'true' );
   $true_checked = '';
@@ -625,6 +651,7 @@ function af_register_settings() {
   register_setting('af-settings-group', 'af_post_type_affinitomics');
   register_setting('af-settings-group', 'af_post_type_posts');
   register_setting('af-settings-group', 'af_post_type_pages');
+  register_setting('af-settings-group', 'af_post_type_products');
   register_setting('af-settings-group', 'af_tag_descriptors');
   register_setting('af-settings-group', 'af_jumpsearch');
   register_setting('af-settings-group', 'af_google_cse_key');
