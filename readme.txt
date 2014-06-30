@@ -103,15 +103,15 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Changelog ==
 
-=0.7.0=
+= 0.7.0 =
 * CSS Styling hooks!
 * Support for WooCommerce!
 
-=0.6.06=
+= 0.6.06 =
 * Changes to internal documentation
 * Other little bug fixes/improvements
 
-=0.6.05=
+= 0.6.05 =
 * Corrections in readme.txt and documentation
 
 = 0.6.04 =
