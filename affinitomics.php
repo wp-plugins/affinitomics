@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.7.00
+Version: 0.7.1
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -50,6 +50,8 @@ if (get_option('af_post_type_affinitomics','true') == 'true') $screens[] = 'arch
 if (get_option('af_post_type_posts','false') == 'true') $screens[] = 'post';
 if (get_option('af_post_type_pages','false') == 'true') $screens[] = 'page';
 if (get_option('af_post_type_products','false') == 'true') $screens[] = 'product';
+if (get_option('af_post_type_projects','false') == 'true') $screens[] = 'project';
+if (get_option('af_post_type_listings','false') == 'true') $screens[] = 'listing';
 
 /* Add Affinitomic Elements to Post and Page edit screens */
 function afpost_add_custom_box() {
@@ -573,19 +575,27 @@ Affinitomics Commercial Code
   $af_post_type_posts = get_option('af_post_type_posts');
   $af_post_type_pages = get_option('af_post_type_pages');
   $af_post_type_products = get_option('af_post_type_products');
+  $af_post_type_projects = get_option('af_post_type_projects');
+  $af_post_type_listings = get_option('af_post_type_listings');
   $af_post_type_affinitomics_checked = '';
   $af_post_type_posts_checked = '';
   $af_post_type_pages_checked = '';
   $af_post_type_products_checked = '';
+  $af_post_type_projects_checked = '';
+  $af_post_type_listings_checked = '';
   if ($af_post_type_affinitomics == 'true') $af_post_type_affinitomics_checked = 'checked="checked"';
   if ($af_post_type_pages == 'true') $af_post_type_pages_checked = 'checked="checked"';
   if ($af_post_type_posts == 'true') $af_post_type_posts_checked = 'checked="checked"';
   if ($af_post_type_products == 'true') $af_post_type_products_checked = 'checked="checked"';
+  if ($af_post_type_projects == 'true') $af_post_type_projects_checked = 'checked="checked"';
+  if ($af_post_type_listings == 'true') $af_post_type_listings_checked = 'checked="checked"';
   echo '<h3>To which Post-types would you like to apply your Affinitomics&trade;?</h3>';
   echo '<input type="checkbox" name="af_post_type_affinitomics" value="true" '.$af_post_type_affinitomics_checked.' /> Affinitomic&trade; Archetypes<br />';
   echo '<input type="checkbox" name="af_post_type_posts" value="true" '.$af_post_type_posts_checked.'/> Posts<br />';
   echo '<input type="checkbox" name="af_post_type_pages" value="true" '.$af_post_type_pages_checked.'/> Pages<br />';
   echo '<input type="checkbox" name="af_post_type_products" value="true" '.$af_post_type_products_checked.'/> Products<br />';
+  echo '<input type="checkbox" name="af_post_type_projects" value="true" '.$af_post_type_projects_checked.'/> Projects<br />';
+  echo '<input type="checkbox" name="af_post_type_listings" value="true" '.$af_post_type_listings_checked.'/> Listings<br />';
 
   $af_tag_descriptors = get_option( 'af_tag_descriptors', 'true' );
   $true_checked = '';
@@ -616,16 +626,28 @@ Affinitomics Commercial Code
   $af_jumpsearch_post_type_affinitomics = get_option('af_jumpsearch_post_type_affinitomics');
   $af_jumpsearch_post_type_posts = get_option('af_jumpsearch_post_type_posts');
   $af_jumpsearch_post_type_pages = get_option('af_jumpsearch_post_type_pages');
+  $af_jumpsearch_post_type_products = get_option('af_jumpsearch_post_type_products');
+  $af_jumpsearch_post_type_projects = get_option('af_jumpsearch_post_type_projects');
+  $af_jumpsearch_post_type_listings = get_option('af_jumpsearch_post_type_listings');
   $af_jumpsearch_post_type_affinitomics_checked = '';
   $af_jumpsearch_post_type_posts_checked = '';
   $af_jumpsearch_post_type_pages_checked = '';
+  $af_jumpsearch_post_type_products_checked = '';
+  $af_jumpsearch_post_type_projects_checked = '';
+  $af_jumpsearch_post_type_listings_checked = '';
   if ($af_jumpsearch_post_type_affinitomics == 'true') $af_jumpsearch_post_type_affinitomics_checked = 'checked="checked"';
   if ($af_jumpsearch_post_type_posts == 'true') $af_jumpsearch_post_type_posts_checked = 'checked="checked"';
   if ($af_jumpsearch_post_type_pages == 'true') $af_jumpsearch_post_type_pages_checked = 'checked="checked"';
+  if ($af_jumpsearch_post_type_products == 'true') $af_jumpsearch_post_type_products_checked = 'checked="checked"';
+  if ($af_jumpsearch_post_type_projects == 'true') $af_jumpsearch_post_type_projects_checked = 'checked="checked"';
+  if ($af_jumpsearch_post_type_listings == 'true') $af_jumpsearch_post_type_listings_checked = 'checked="checked"';
   echo '<h4>Which Pages or Post-types should have a JumpSearch field?</h4>';
   echo '<input type="checkbox" name="af_jumpsearch_post_type_affinitomics" value="true"  '.$af_jumpsearch_post_type_affinitomics_checked.' /> Affinitomic&trade; Archetypes<br />';
   echo '<input type="checkbox" name="af_jumpsearch_post_type_posts" value="true" '.$af_jumpsearch_post_type_posts_checked.'/> Posts<br />';
   echo '<input type="checkbox" name="af_jumpsearch_post_type_pages" value="true" '.$af_jumpsearch_post_type_pages_checked.'/> Pages<br />';
+  echo '<input type="checkbox" name="af_jumpsearch_post_type_products" value="true" '.$af_jumpsearch_post_type_products_checked.'/> Products<br />';
+  echo '<input type="checkbox" name="af_jumpsearch_post_type_projects" value="true" '.$af_jumpsearch_post_type_projects_checked.'/> Projects<br />';
+  echo '<input type="checkbox" name="af_jumpsearch_post_type_listings" value="true" '.$af_jumpsearch_post_type_Listings_checked.'/> Listings<br />';
 
   $af_jumpsearch_location = get_option( 'af_jumpsearch_location', 'bottom' );
   $top_checked = '';
@@ -652,6 +674,8 @@ function af_register_settings() {
   register_setting('af-settings-group', 'af_post_type_posts');
   register_setting('af-settings-group', 'af_post_type_pages');
   register_setting('af-settings-group', 'af_post_type_products');
+  register_setting('af-settings-group', 'af_post_type_projects');
+  register_setting('af-settings-group', 'af_post_type_listings');
   register_setting('af-settings-group', 'af_tag_descriptors');
   register_setting('af-settings-group', 'af_jumpsearch');
   register_setting('af-settings-group', 'af_google_cse_key');

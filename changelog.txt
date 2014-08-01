@@ -5,6 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+0.7.1 - 8/1/2014
+- Affinitomics support for Project and Listing post-types added
+- Google integration for Products, Projects, and Listings added
+- Better Shortcode execution
+- Better documentation
+- Bug fixes and minor enhancements
+----------------------------------------------------------------------
+
 0.7.0 - 6/26/2014
 - CSS Styling hooks!
 - Woocommerce Support!
