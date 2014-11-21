@@ -73,40 +73,96 @@ Copyright (C) 2014 Prefrent
         }
         $post_id = get_the_ID();
 
-        // Get Affinitomic Meta Data
-        $descriptors_meta = get_post_meta($post_id, '_afpost_descriptors', true);
-        $draw_meta = get_post_meta($post_id, '_afpost_draw', true);
-        $distance_meta = get_post_meta($post_id, '_afpost_distance', true);
+        $these_descriptors = wp_get_post_terms( $post_id, "descriptor" );
+        $descriptor_terms = array();
 
-        // Use Meta Data to Build Affinitomic Search String
+        foreach ($these_descriptors as $descriptor) {
+          array_push($descriptor_terms, $descriptor->name);
+        }
+
+        // Collect draws, find the highest draw
+        $best_draw = "";
+        $best_draw_num = 0;
+
+        $these_draws = wp_get_post_terms( $post_id, "draw" );
+        $draw_terms = array();
+        foreach ($these_draws as $draw) {
+          $this_weight = substr($draw->name, -1);
+          if (is_numeric($this_weight)){
+            if ($this_weight > 1) {
+              if ( $this_weight > $best_draw_num ) {
+                $best_draw = preg_replace("/[0-9]/", "", $draw->name);
+                $best_draw_num = $this_weight;
+              } 
+            } 
+          } 
+          else {
+            $draw->name = preg_replace("/[0-9]/", "", $draw->name);
+            array_push($draw_terms, $draw->name);
+          }
+        }
+
+        // Find the best distance or use the first one
+        $best_distance = "";
+        $best_distance_num = 0;
+
+        $these_distances = wp_get_post_terms( $post_id, "distance" );
+        $distance_terms = array();
+        foreach ($these_distances as $distance) {
+          $this_weight = substr($distance->name, -1);
+          if (is_numeric($this_weight)){
+            if ( $this_weight > $best_distance_num ) {
+              $best_distance = preg_replace("/[0-9]/", "", $distance->name);
+              $best_distance_num = $this_weight;
+            }
+          } 
+          else {
+            $distance->name = preg_replace("/[0-9]/", "", $distance->name);
+            array_push($distance_terms, $distance->name);
+          }
+        }
+
+        if (count($descriptor_terms) > 0){
+          $descriptors_meta = $descriptor_terms[0];
+        } else {
+          $descriptors_meta = "";
+        }
+
+        if($best_draw != ""){
+          $draw_meta = $best_draw;
+        } else if (count($draw_terms) > 0){
+          $draw_meta = $draw_terms[0];
+        } else {
+          $draw_meta = "";
+        }
+
+        if($best_distance != ""){
+          $distance_meta = '-' . $best_distance;
+        } else if (count($distance_terms) > 0){
+          $distance_meta = '-' . $distance_terms[0];
+        } else {
+          $distance_meta = "";
+        }
+
+        // Use Taxonomy Data to Build Affinitomic Search String
         $affinitomics = '';
         if ($descriptors_meta != '') {
-            $affinitomics = $descriptors_meta; 
+          $affinitomics = $descriptors_meta;
         }
         if ($draw_meta != '') {
-            if ($affinitomics == '') { 
-                $affinitomics = $draw_meta; 
-            } else {
-                $affinitomics .= ', ' . $draw_meta; 
-            }
+          if ($affinitomics == '') {
+            $affinitomics = $draw_meta;
+          } else {
+            $affinitomics .= ', ' . $draw_meta;
+          }
         }
         if ($distance_meta != '') {
-            if ($affinitomics == '') { 
-                $affinitomics = $distance_meta; 
-            } else {
-                $affinitomics .= ', ' . $distance_meta; 
-            }
+          if ($affinitomics == '') {
+            $affinitomics = $distance_meta;
+          } else {
+            $affinitomics .= ', ' . $distance_meta;
+          }
         }
-
-        // Clean Up Search String For Google
-        $affinitomics = str_replace(range(0,9),'',$affinitomics);
-        $affinitomics = str_replace('+','',$affinitomics);
-        $affinitomics = str_replace(',','%22%22',$affinitomics);
-        $affinitomics = str_replace('%22 ','%22',$affinitomics);
-        $affinitomics = str_replace('%22%22','%22+%22',$affinitomics);
-        $affinitomics = str_replace(' ','+',$affinitomics);
-        $affinitomics = str_replace('%22-','-%22',$affinitomics);
-        $affinitomics = '%22' . $affinitomics . '%22'; 
 
     ?>
 

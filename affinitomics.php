@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.7.1
+Version: 0.9.0
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -29,17 +29,10 @@ Copyright (C) 2014 Prefrent
 // | MA 02110-1301 USA                                                    |
 // +----------------------------------------------------------------------+
 
-
 wp_enqueue_style( 'afpost-style', plugins_url('affinitomics.css', __FILE__) );
 
-/*
-----------------------------------------------------------------------
-META BOXES FOR POST CLASSIFICATION (descriptors, draw, and distance)
-----------------------------------------------------------------------
-*/
-
-/* Meta Box */
-add_action( 'add_meta_boxes', 'afpost_add_custom_box' );
+// This is so we can check if the affinitomics taxonomy converter plugin is installed
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 /* Save Action */
 add_action( 'save_post', 'afpost_save_postdata' );
@@ -53,91 +46,41 @@ if (get_option('af_post_type_products','false') == 'true') $screens[] = 'product
 if (get_option('af_post_type_projects','false') == 'true') $screens[] = 'project';
 if (get_option('af_post_type_listings','false') == 'true') $screens[] = 'listing';
 
-/* Add Affinitomic Elements to Post and Page edit screens */
-function afpost_add_custom_box() {
-    global $screens;
-    foreach ($screens as $screen) {
-        add_meta_box(
-            'afpost_id',
-            'Affinitomic Elements',
-            'afpost_inner_custom_box',
-            $screen
-        );
-    }
-}
-
-/* Prints the box content */
-function afpost_inner_custom_box( $post ) {
-
-  // Use nonce for verification
-  wp_nonce_field( plugin_basename( __FILE__ ), 'afpost_noncename' );
-
-  // Get post meta values
-  $afpost_descriptors_value = get_post_meta( $post->ID, '_afpost_descriptors', true );
-  $afpost_draw_value = get_post_meta( $post->ID, '_afpost_draw', true );
-  $afpost_distance_value = get_post_meta( $post->ID, '_afpost_distance', true );
-
-  // Get POST Count
-  $count_posts = wp_count_posts();
-  if ($count_posts->publish > 10000) {
-
-    echo '<h1>Affinitomic License Exceeded.</h1>';
-    echo '<p>Please Contact Prefrent For Expanded Post Coverage.</p>';
-    echo '<br style="clear:both;" />';
-
-  } else {
-
-    echo '<div class="afpost_metabox">';
-    echo '<label for="afpost_descriptors">';
-    echo '<strong>Descriptors</strong> (similar to \'tags\')';
-    echo '</label><br>';
-    echo '<textarea id="afpost_descriptors" name="afpost_descriptors">'.esc_attr($afpost_descriptors_value).'</textarea>';
-    echo '<p><strong>Syntax:</strong> These are the similar to \'tags\' in Wordpress.</p>';
-    echo '</div>';
-
-    echo '<div class="afpost_metabox">';
-    echo '<label for="afpost_draw">';
-    echo '<strong>Draw</strong> (positive relationships)';
-    echo '</label><br>';
-    echo '<textarea id="afpost_draw" name="afpost_draw">'.esc_attr($afpost_draw_value).'</textarea>';
-    echo '<p><strong>Syntax:</strong> Draws are generally preceded with a \'plus\' and written with a magnitude from one to five as a suffix, with each draw seperated by a comma. If a magnitude is not present, a magnitude of one will be assumed.</p>';
-    echo '</div>';
-
-    echo '<div class="afpost_metabox">';
-    echo '<label for="afpost_distance">';
-    echo '<strong>Distance</strong> (negative relationships)';
-    echo '</label><br>';
-    echo '<textarea id="afpost_distance" name="afpost_distance">'.esc_attr($afpost_distance_value).'</textarea>';
-    echo '<p><strong>Syntax:</strong> Distances are generally preceded with a \'minus\' and written with a magnitude from one to five as a suffix, with each distance seperated by a comma. If a magnitude is not present, a magnitude of one will be assumed.</p>';
-    echo '</div>';
-    echo '<br style="clear:both" />';
-  }
-}
-
 /* Save Custom DATA */
-function afpost_save_postdata( $post_id ) {
+function afpost_save_postdata( $post_id = null ) {
 
-  // First we need to check if the current user is authorised to do this action.
-  if ( 'page' == $_POST['post_type'] ) {
-    if ( ! current_user_can( 'edit_page', $post_id ) )
-        return;
+  // Get Post ID if not passed in
+  if($post_id == null){
+    $post_ID = $_POST['post_ID'];
   } else {
-    if ( ! current_user_can( 'edit_post', $post_id ) )
-        return;
+    $post_ID = $post_id;
   }
 
-  // NONCE
-  if ( ! isset( $_POST['afpost_noncename'] ) || ! wp_verify_nonce( $_POST['afpost_noncename'], plugin_basename( __FILE__ ) ) ) {
-    return;
+  // Collect descriptor terms from the post
+  $these_descriptors = wp_get_post_terms( $post_ID, "descriptor" );
+  $descriptor_terms = array();
+  foreach ($these_descriptors as $descriptor) {
+    array_push($descriptor_terms, $descriptor->name);
   }
 
-  // Get Post ID
-  $post_ID = $_POST['post_ID'];
+  // Collect draw terms from the post
+  $these_draws = wp_get_post_terms( $post_ID, "draw" );
+  $draw_terms = array();
+  foreach ($these_draws as $draw) {
+    array_push($draw_terms, $draw->name);
+  }
 
-  // Sanitize
-  $afpost_descriptors = sanitize_text_field( $_POST['afpost_descriptors'] );
-  $afpost_draw = sanitize_text_field( $_POST['afpost_draw'] );
-  $afpost_distance = sanitize_text_field( $_POST['afpost_distance'] );
+  // Collect distance terms from the post
+  $these_distances = wp_get_post_terms( $post_ID, "distance" );
+  $distance_terms = array();
+  foreach ($these_distances as $distance) {
+    array_push($distance_terms, $distance->name);
+  }
+
+  // implode the data
+  $afpost_descriptors =  implode(",", $descriptor_terms);
+  $afpost_draw = implode(",", $draw_terms);
+  $afpost_distance = implode(",", $distance_terms);
 
   // Save Meta DATA
   add_post_meta($post_ID, '_afpost_descriptors', $afpost_descriptors, true) or update_post_meta($post_ID, '_afpost_descriptors', $afpost_descriptors);
@@ -182,24 +125,6 @@ function afpost_save_postdata( $post_id ) {
     }
   }
   $af_flag = 1;
-
-  // Update tags
-  if (get_option('af_tag_descriptors','true') == 'true') {
-    if ($afpost_descriptors != '') {
-      wp_set_post_terms( $post_ID, $afpost_descriptors, 'post_tag', false );
-    }
-    if ($afpost_draw != '') {
-      $afpost_draw = str_replace(range(0,9),'',$afpost_draw);
-      $afpost_draw = str_replace('+','',$afpost_draw);
-      wp_set_post_terms( $post_ID, $afpost_draw, 'draw', false );
-    }
-    if ($afpost_distance != '') {
-      $afpost_distance = str_replace(range(0,9),'',$afpost_distance);
-      $afpost_distance = str_replace('-','',$afpost_distance);
-      wp_set_post_terms( $post_ID, $afpost_distance, 'distance', false );
-    }
-  }
-
 }
 
 /*
@@ -208,10 +133,48 @@ CUSTOM TAXONOMY
 ----------------------------------------------------------------------
 */
 
-// Register Custom Taxonomy
+// Register Custom Taxonomy Descriptor
+function descriptor_taxonomy()  {
+    $labels = array(
+        'name'                       => _x( 'Descriptors', 'Taxonomy General Name', 'text_domain' ),
+        'singular_name'              => _x( 'Descriptor', 'Taxonomy Singular Name', 'text_domain' ),
+        'menu_name'                  => __( 'Descriptor', 'text_domain' ),
+        'all_items'                  => __( 'All Descriptors', 'text_domain' ),
+        'parent_item'                => __( 'Parent Descriptor', 'text_domain' ),
+        'parent_item_colon'          => __( 'Parent Descriptor:', 'text_domain' ),
+        'new_item_name'              => __( 'New Descriptor', 'text_domain' ),
+        'add_new_item'               => __( 'Add New Descriptor', 'text_domain' ),
+        'edit_item'                  => __( 'Edit Descriptor', 'text_domain' ),
+        'update_item'                => __( 'Update Descriptor', 'text_domain' ),
+        'separate_items_with_commas' => __( '<strong>Descriptors</strong> are similar to Categories in Wordpress. Separate
+                       each Descriptor with commas. <strong>e.g.</strong> Summer Activities, Hobbies', 
+                       'text_domain' ),
+        'search_items'               => __( 'Search descriptors', 'text_domain' ),
+        'add_or_remove_items'        => __( 'Add or remove descriptors', 'text_domain' ),
+        'choose_from_most_used'      => __( 'Choose from the most used Descriptors', 'text_domain' ),
+    );
+
+    $args = array(
+        'labels'                     => $labels,
+        'hierarchical'               => false,
+        'public'                     => true,
+        'show_ui'                    => true,
+        'show_admin_column'          => true,
+        'show_in_nav_menus'          => true,
+        'show_tagcloud'              => true,
+    );
+
+    global $screens;
+    register_taxonomy( 'descriptor', $screens, $args );
+}
+
+// Hook into the 'init' action
+add_action( 'init', 'descriptor_taxonomy', 0 );
+
+// Register Custom Taxonomy Draw
 function draw_taxonomy()  {
     $labels = array(
-        'name'                       => _x( 'Positive Relationships', 'Taxonomy General Name', 'text_domain' ),
+        'name'                       => _x( 'Positive Relationships (Draws)', 'Taxonomy General Name', 'text_domain' ),
         'singular_name'              => _x( 'Draw', 'Taxonomy Singular Name', 'text_domain' ),
         'menu_name'                  => __( 'Draw', 'text_domain' ),
         'all_items'                  => __( 'All Draws', 'text_domain' ),
@@ -221,10 +184,13 @@ function draw_taxonomy()  {
         'add_new_item'               => __( 'Add New Draw', 'text_domain' ),
         'edit_item'                  => __( 'Edit Draw', 'text_domain' ),
         'update_item'                => __( 'Update Draw', 'text_domain' ),
-        'separate_items_with_commas' => __( 'Separate draws with commas', 'text_domain' ),
+        'separate_items_with_commas' => __( '<strong>Syntax:</strong> Draws can have a magnitude from 1 to 5 written
+                       as a suffix, with each draw separated by a comma. If a magnitude is not present, 
+                       a magnitude of one will be assumed. <strong>e.g.</strong> Cats5, Laser Pointer2',
+                       'text_domain' ),
         'search_items'               => __( 'Search draws', 'text_domain' ),
         'add_or_remove_items'        => __( 'Add or remove draws', 'text_domain' ),
-        'choose_from_most_used'      => __( 'Choose from the most used draws', 'text_domain' ),
+        'choose_from_most_used'      => __( 'Choose from the most used Draws', 'text_domain' ),
     );
 
     $args = array(
@@ -244,11 +210,10 @@ function draw_taxonomy()  {
 // Hook into the 'init' action
 add_action( 'init', 'draw_taxonomy', 0 );
 
-
-// Register Custom Taxonomy
+// Register Custom Taxonomy Distance
 function distance_taxonomy()  {
     $labels = array(
-        'name'                       => _x( 'Negative Relationships', 'Taxonomy General Name', 'text_domain' ),
+        'name'                       => _x( 'Negative Relationships (Distances)', 'Taxonomy General Name', 'text_domain' ),
         'singular_name'              => _x( 'Distance', 'Taxonomy Singular Name', 'text_domain' ),
         'menu_name'                  => __( 'Distance', 'text_domain' ),
         'all_items'                  => __( 'All Distances', 'text_domain' ),
@@ -258,10 +223,13 @@ function distance_taxonomy()  {
         'add_new_item'               => __( 'Add New Distance', 'text_domain' ),
         'edit_item'                  => __( 'Edit Distance', 'text_domain' ),
         'update_item'                => __( 'Update Distance', 'text_domain' ),
-        'separate_items_with_commas' => __( 'Separate Distances with commas', 'text_domain' ),
+        'separate_items_with_commas' => __( '<strong>Syntax:</strong> Distances can have a magnitude of 1 to 5, written 
+                       as a suffix, with each distance separated by a comma. If a magnitude is not present, 
+                       a magnitude of one will be assumed. <strong>e.g.</strong> Nickelback5, Canada2', 
+                       'text_domain' ),
         'search_items'               => __( 'Search Distance', 'text_domain' ),
         'add_or_remove_items'        => __( 'Add or remove Distance', 'text_domain' ),
-        'choose_from_most_used'      => __( 'Choose from the most used Distance', 'text_domain' ),
+        'choose_from_most_used'      => __( 'Choose from the most used Distances', 'text_domain' ),
     );
 
     $args = array(
@@ -309,7 +277,7 @@ function arche_type() {
     'description'         => __( 'Archetype information pages', 'text_domain' ),
     'labels'              => $labels,
     'supports'            => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', 'post-formats', ),
-    'taxonomies'          => array( 'category', 'post_tag', 'discriptor', 'draw', 'distance' ),
+    'taxonomies'          => array( 'descriptor', 'draw', 'distance' ),
     'hierarchical'        => false,
     'public'              => true,
     'show_ui'             => true,
@@ -418,9 +386,10 @@ function afview_function($atts) {
       if (!isset($raf['element']['uid'])) {
         $process_element = false;
       }
+
       // Valid Post?
       $post_title = get_post_field('post_title', $raf['element']['uid']);
-      if (is_wp_error($post_title)) {
+      if (is_wp_error($post_title) || get_post_status( $raf['element']['uid'] ) == "trash") {
         $process_element = false;
       }
       // Categories
@@ -453,19 +422,18 @@ Administration and Settings Menu
 */
 
 add_action( 'admin_menu', 'af_plugin_menu' );
-function af_plugin_menu() {
-  // Rename Tags to Descriptors
-  remove_submenu_page( 'edit.php?post_type=archetype', 'edit-tags.php?taxonomy=post_tag&amp;post_type=archetype' );
-  add_submenu_page( 'edit.php?post_type=archetype', 'Descriptors', 'Descriptors', 'manage_options', 'edit-tags.php?taxonomy=post_tag&amp;post_type=archetype');
 
+function af_plugin_menu() {
   // Add Custom Sub Menus
   add_submenu_page( 'edit.php?post_type=archetype', 'Settings', 'Settings', 'manage_options', 'affinitomics', 'af_plugin_options');
   add_action( 'admin_init', 'af_register_settings' );
   add_submenu_page( 'edit.php?post_type=archetype', 'Cloud Export', 'Cloud Export', 'manage_options', 'afcloudify', 'af_plugin_export');
 }
+
 /*
 Affinitomics Commercial Code
 */
+
 function af_plugin_export() {
   if ( !current_user_can( 'manage_options' ) )  {
     wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
@@ -482,10 +450,12 @@ function af_plugin_export() {
     );
     $posts_array = get_posts($args);
     echo '<ol>';
+    $nothing_to_export = true;
     foreach($posts_array as $post) {
       $id = $post->ID;
       $afid = get_post_meta($id, 'afid', true);
-      if ($afid == false) next;
+      if ($afid) continue;
+      $nothing_to_export = false;
       $cat_string = '';
       $categories = get_the_category($id);
       if ($categories) {
@@ -495,18 +465,41 @@ function af_plugin_export() {
         }
         $cat_string = implode(",", $cats);
       }
+    
+      // Collect draw terms from the post
+      $these_draws = wp_get_post_terms( $id, "draw" );
+      $draw_terms = array();
+      foreach ($these_draws as $draw) {
+      array_push($draw_terms, $draw->name);
+      }
+
+      // Collect distance terms from the post
+      $these_distances = wp_get_post_terms( $id, "distance" );
+      $distance_terms = array();
+      foreach ($these_distances as $distance) {
+      array_push($distance_terms, $distance->name);
+      }
+      
+      // Collect descriptor terms from the post
+      $these_descriptors = wp_get_post_terms( $id, "descriptor" );
+      $descriptor_terms = array();
+      foreach ($these_descriptors as $descriptor) {
+      array_push($descriptor_terms, $descriptor->name);
+      }
+  
       $affinitomics = array(
         'url' =>  get_permalink($id),
         'title' => get_the_title($id),
-        'descriptors' => get_post_meta($id, '_afpost_descriptors', true),
-        'draw' => get_post_meta($id, '_afpost_draw', true),
-        'distance' => get_post_meta($id, '_afpost_distance', true),
+        'descriptors' => implode(',', $descriptor_terms),
+        'draw' => implode(',', $draw_terms),
+        'distance' => implode(',', $distance_terms),
         'afid' => $afid,
         'domain' => get_option('af_domain'),
         'key' => get_option('af_key'),
         'uid' => $id,
         'category' => $cat_string
       );
+
       if ($affinitomics['descriptors'] || $affinitomics['draw'] || $affinitomics['distance']) {
         $af_cloud_url = get_option('af_cloud_url');
         $request = curl_request($af_cloud_url.'/v1/post/affinitomics/', $affinitomics);
@@ -520,6 +513,9 @@ function af_plugin_export() {
           update_post_meta($id, 'afid', $af['data']['objectId']);
         }
       }
+    }
+    if ($nothing_to_export) {
+      echo 'Everything is already synced!';
     }
     echo '</ol>';
   }
@@ -537,6 +533,13 @@ function af_plugin_export() {
   submit_button('Export');
   echo '</form>';
   echo '</div>';
+  
+  if (is_plugin_active('affinitomics-taxonomy-converter/affinitomics-taxonomy-converter.php')) {
+    echo '<a href="admin.php?import=wptaxconvertaffinitomics">Convert Taxonomy</a>';
+  } else {
+    // When we publish the plugin we should change this to a hyperlink, currently we do not have the URL
+  echo 'Hey, did you know we have a handy importing tool? Check out the "Affinitomics Taxonomy Converter" ';
+  }
 }
 
 function af_plugin_options() {
@@ -552,7 +555,7 @@ function af_plugin_options() {
   if ($count_posts->publish > 10000) {
     echo '<h3>Affinitomic License Exceeded.</h3>';
     echo '<p>Please Contact Prefrent For Expanded Post Coverage.</p>';
-    echo '<hr />';
+    echo '<hr>';
   }
 /*
 Affinitomics Commercial Code
@@ -602,9 +605,6 @@ Affinitomics Commercial Code
   $false_checked = '';
   if ($af_tag_descriptors == 'true') $true_checked = 'checked="checked"';
   if ($af_tag_descriptors == 'false') $false_checked = 'checked="checked"';
-// echo '<h3>Apply Affinitomics to Category Tags?</h3>';
-//  echo '<input type="radio" name="af_tag_descriptors" value="true" '.$true_checked.'/> Yes<br />';
-//  echo '<input type="radio" name="af_tag_descriptors" value="false"  '.$false_checked.'/> No<br />';
 
   $af_jumpsearch = get_option( 'af_jumpsearch', 'false' );
   $true_checked = '';
@@ -718,126 +718,211 @@ Search HTML Produced by Google CSE:
   #af-search h2 {background-color:magenta;}
   #search-content  {background-color:green;}
 */
+
 if (get_option('af_jumpsearch') == 'true') {
   add_filter( 'the_content', 'af_search_content_filter', 20 );
 }
+
+// Compare this post type with the user options
+function this_page_search_enabled(){
+  $this_page_type = get_post_type( get_the_ID() );
+
+  switch ($this_page_type) {
+      case 'archetype':
+          return get_option('af_jumpsearch_post_type_affinitomics');
+          break;
+      case 'post':
+          return get_option('af_jumpsearch_post_type_posts');
+          break;
+      case 'page':
+          return get_option('af_jumpsearch_post_type_pages');
+          break;
+      case 'product':
+        return get_option('af_jumpsearch_post_type_products');
+        break;
+      case 'project':
+        return get_option('af_jumpsearch_post_type_projects');
+        break;
+      case 'listing':
+        return get_option('af_jumpsearch_post_type_listings');
+        break;
+  }
+
+}
+
 function af_search_content_filter( $content ) {
+  if(this_page_search_enabled()){
+    if ( is_singular() ) {
+      $cse = '';
+      $cse .= '<script>';
+      // Search Engine ID
+      $cse .= "var cx = '" . get_option('af_google_cse_id') . "';";
+      // API Key
+      $cse .= "var key = '" . get_option('af_google_cse_key') . "';";
+        $q = '';
+        if (isset($_REQUEST['q'])) {
+          $q = htmlspecialchars(strip_tags($_REQUEST['q']));
+          $cse .= 'var q = "' . $q . '";';
+        } else {
+          $cse .= 'var q = "";';
+        }
+        $a = '';
+        if (isset($_REQUEST['a'])) {
+          $a = htmlspecialchars(strip_tags($_REQUEST['a']));
+          $cse .= 'var a = "' . $a . '";';
+        } else {
+          $cse .= 'var a = "";';
+        }
+      $cse .= '</script>';
 
-  if ( is_singular() ) {
-    $cse = '';
-    $cse .= '<script>';
-    // Search Engine ID
-    $cse .= "var cx = '" . get_option('af_google_cse_id') . "';";
-    // API Key
-    $cse .= "var key = '" . get_option('af_google_cse_key') . "';";
-      $q = '';
-      if (isset($_REQUEST['q'])) {
-        $q = htmlspecialchars(strip_tags($_REQUEST['q']));
-        $cse .= 'var q = "' . $q . '";';
-      } else {
-        $cse .= 'var q = "";';
+      $post_id = get_the_ID();
+
+      // Collect descriptor terms from the post
+      $these_descriptors = wp_get_post_terms( $post_id, "descriptor" );
+      $descriptor_terms = array();
+
+      foreach ($these_descriptors as $descriptor) {
+        array_push($descriptor_terms, $descriptor->name);
       }
-      $a = '';
-      if (isset($_REQUEST['a'])) {
-        $a = htmlspecialchars(strip_tags($_REQUEST['a']));
-        $cse .= 'var a = "' . $a . '";';
-      } else {
-        $cse .= 'var a = "";';
+
+      // Collect draws, find the highest draw
+      $best_draw = "";
+      $best_draw_num = 0;
+
+      $these_draws = wp_get_post_terms( $post_id, "draw" );
+      $draw_terms = array();
+      foreach ($these_draws as $draw) {
+        $this_weight = substr($draw->name, -1);
+        if (is_numeric($this_weight)){
+          if ($this_weight > 1) {
+            if ( $this_weight > $best_draw_num ) {
+              $best_draw = preg_replace("/[0-9]/", "", $draw->name);
+              $best_draw_num = $this_weight;
+            } 
+          } 
+        } 
+        else {
+          $draw->name = preg_replace("/[0-9]/", "", $draw->name);
+          array_push($draw_terms, $draw->name);
+        }
       }
-    $cse .= '</script>';
 
-    $post_id = get_the_ID();
+      // Find the best distance or use the first one
+      $best_distance = "";
+      $best_distance_num = 0;
 
-    // Get Affinitomic Meta Data
-    $descriptors_meta = get_post_meta($post_id, '_afpost_descriptors', true);
-    $draw_meta = get_post_meta($post_id, '_afpost_draw', true);
-    $distance_meta = get_post_meta($post_id, '_afpost_distance', true);
-
-    // Use Meta Data to Build Affinitomic Search String
-    $affinitomics = '';
-    if ($descriptors_meta != '') {
-      $affinitomics = $descriptors_meta;
-    }
-    if ($draw_meta != '') {
-      if ($affinitomics == '') {
-        $affinitomics = $draw_meta;
-      } else {
-        $affinitomics .= ', ' . $draw_meta;
-      }
-    }
-    if ($distance_meta != '') {
-      if ($affinitomics == '') {
-        $affinitomics = $distance_meta;
-      } else {
-        $affinitomics .= ', ' . $distance_meta;
-      }
-    }
-
-    // Clean Up Search String For Google
-    $affinitomics = str_replace(range(0,9),'',$affinitomics);
-    $affinitomics = str_replace('+','',$affinitomics);
-    $affinitomics = str_replace(',','%22%22',$affinitomics);
-    $affinitomics = str_replace('%22 ','%22',$affinitomics);
-    $affinitomics = str_replace('%22%22','%22+%22',$affinitomics);
-    $affinitomics = str_replace(' ','+',$affinitomics);
-    $affinitomics = str_replace('%22-','-%22',$affinitomics);
-    $affinitomics = '%22' . $affinitomics . '%22';
-
-    if ($affinitomics != '') {
-      $cse .= '<div>&nbsp;</div>';
-      $cse .= '<div id="af-search">';
-      $cse .= '<h2>Search Using Affinitomic Profile:</h2>';
-      $cse .= '<form action="" method="post" name="afsearch">';
-      $cse .= '<input type="hidden" name="a" id="a" value="' . $affinitomics .'" />';
-      $cse .= '<input type="text" name="q" id="q" value="'. $q . '"/> ';
-      $cse .= '<input type="submit"/>';
-      $cse .= '</form><br />';
-      $cse .= '<ul id="search-content"></ul>';
-    }
-
-    if (isset($_REQUEST['q'])) {
-      /*
-      <script>
-          function gcs(response) {
-            //console.log(JSON.stringify(response.searchInformation));
-            if ((typeof response != 'undefined') && (response.searchInformation.totalResults > 0)){
-              for (var i = 0; i < response.items.length; i++) {
-                  var item = response.items[i];
-                  document.getElementById("search-content").innerHTML += "<li><a href='" + item.link + "'>" + item.htmlTitle + "</a></li>";
-              }
-            } else {
-                  document.getElementById("search-content").innerHTML += "<li>No results found.</li>";
-            }
+      $these_distances = wp_get_post_terms( $post_id, "distance" );
+      $distance_terms = array();
+      foreach ($these_distances as $distance) {
+        $this_weight = substr($distance->name, -1);
+        if (is_numeric($this_weight)){
+          if ( $this_weight > $best_distance_num ) {
+            $best_distance = preg_replace("/[0-9]/", "", $distance->name);
+            $best_distance_num = $this_weight;
           }
-          document.write("<script src='"+"https://www.googleapis.com/customsearch/v1?key="+key+"&cx="+cx+"&q="+q+" "+a+"&callback=gcs"+"'><\/script>");
-      </script>
-      */
-      $cse .= "<script>\n";
-      $cse .= "function gcs(response) {\n";
-      $cse .= "//console.log(JSON.stringify(response.searchInformation));\n";
-      $cse .= "if ((typeof response != 'undefined') && (response.searchInformation.totalResults > 0)){\n";
-      $cse .= "for (var i = 0; i < response.items.length; i++) {\n";
-      $cse .= "var item = response.items[i];\n";
-      $cse .= "document.getElementById(\"search-content\").innerHTML += \"<li><a href='\" + item.link + \"'>\" + item.htmlTitle + \"</a></li>\";\n";
-      $cse .= "}\n";
-      $cse .= "} else {\n";
-      $cse .= 'document.getElementById("search-content").innerHTML += "<li>No results found.</li>";';
-      $cse .= "}\n";
-      $cse .= "}\n";
-      $cse .= "document.write(\"<script src='\"+\"https://www.googleapis.com/customsearch/v1?key=\"+key+\"&cx=\"+cx+\"&q=\"+q+\" \"+a+\"&callback=gcs\"+\"'><\/script>\");\n";
-      $cse .= "</script>\n";
-    }
-    $cse .= '</div><!-- af-search -->';
+        } 
+        else {
+          $distance->name = preg_replace("/[0-9]/", "", $distance->name);
+          array_push($distance_terms, $distance->name);
+        }
+      }
 
+      if (count($descriptor_terms) > 0){
+        $descriptors_meta = $descriptor_terms[0];
+      } else {
+        $descriptors_meta = "";
+      }
 
-    $modified_content = '';
-    if (get_option('af_jumpsearch_location') == 'top') $modified_content .= $cse;
-    $modified_content .= $content;
-    if (get_option('af_jumpsearch_location') == 'bottom') $modified_content .= $cse;
-    return $modified_content;
-  } else {
-    return $content;
-  } /* is_single() */
+      if($best_draw != ""){
+        $draw_meta = $best_draw;
+      } else if (count($draw_terms) > 0){
+        $draw_meta = $draw_terms[0];
+      } else {
+        $draw_meta = "";
+      }
+
+      if($best_distance != ""){
+        $distance_meta = '-' . $best_distance;
+      } else if (count($distance_terms) > 0){
+        $distance_meta = '-' . $distance_terms[0];
+      } else {
+        $distance_meta = "";
+      }
+
+      // Use Taxonomy Data to Build Affinitomic Search String
+      $affinitomics = '';
+      if ($descriptors_meta != '') {
+        $affinitomics = $descriptors_meta;
+      }
+      if ($draw_meta != '') {
+        if ($affinitomics == '') {
+          $affinitomics = $draw_meta;
+        } else {
+          $affinitomics .= ', ' . $draw_meta;
+        }
+      }
+      if ($distance_meta != '') {
+        if ($affinitomics == '') {
+          $affinitomics = $distance_meta;
+        } else {
+          $affinitomics .= ', ' . $distance_meta;
+        }
+      }
+
+      if ($affinitomics != '') {
+        $cse .= '<div>&nbsp;</div>';
+        $cse .= '<div id="af-search">';
+        $cse .= '<h2>Search Using Affinitomic Profile:</h2>';
+        $cse .= '<form action="" method="post" name="afsearch">';
+        $cse .= '<input type="hidden" name="a" id="a" value="' . $affinitomics .'" />';
+        $cse .= '<input type="text" name="q" id="q" value="'. $q . '"/> ';
+        $cse .= '<input type="submit"/>';
+        $cse .= '</form><br />';
+        $cse .= '<ul id="search-content"></ul>';
+      }
+
+      if (isset($_REQUEST['q'])) {
+        /*
+        <script>
+            function gcs(response) {
+              //console.log(JSON.stringify(response.searchInformation));
+              if ((typeof response != 'undefined') && (response.searchInformation.totalResults > 0)){
+                for (var i = 0; i < response.items.length; i++) {
+                    var item = response.items[i];
+                    document.getElementById("search-content").innerHTML += "<li><a href='" + item.link + "'>" + item.htmlTitle + "</a></li>";
+                }
+              } else {
+                    document.getElementById("search-content").innerHTML += "<li>No results found.</li>";
+              }
+            }
+            document.write("<script src='"+"https://www.googleapis.com/customsearch/v1?key="+key+"&cx="+cx+"&q="+q+" "+a+"&callback=gcs"+"'><\/script>");
+        </script>
+        */
+        $cse .= "<script>\n";
+        $cse .= "function gcs(response) {\n";
+        $cse .= "//console.log(JSON.stringify(response.searchInformation));\n";
+        $cse .= "if ((typeof response != 'undefined') && (response.searchInformation.totalResults > 0)){\n";
+        $cse .= "for (var i = 0; i < response.items.length; i++) {\n";
+        $cse .= "var item = response.items[i];\n";
+        $cse .= "document.getElementById(\"search-content\").innerHTML += \"<li><a href='\" + item.link + \"'>\" + item.htmlTitle + \"</a></li>\";\n";
+        $cse .= "}\n";
+        $cse .= "} else {\n";
+        $cse .= 'document.getElementById("search-content").innerHTML += "<li>No results found.</li>";';
+        $cse .= "}\n";
+        $cse .= "}\n";
+        $cse .= "document.write(\"<script src='\"+\"https://www.googleapis.com/customsearch/v1?key=\"+key+\"&cx=\"+cx+\"&q=\"+q+\" \"+a+\"&callback=gcs\"+\"'><\/script>\");\n";
+        $cse .= "</script>\n";
+      }
+      $cse .= '</div><!-- af-search -->';
+
+      $modified_content = '';
+      if (get_option('af_jumpsearch_location') == 'top') $modified_content .= $cse;
+      $modified_content .= $content;
+      if (get_option('af_jumpsearch_location') == 'bottom') $modified_content .= $cse;
+      return $modified_content;
+    } 
+  }
+  return $content;
 }
 /*
 End Affinitomics Commercial Code

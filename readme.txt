@@ -1,10 +1,10 @@
 === Plugin Name ===
-Contributors: ignitriun, joewils
+Contributors: ignitriun, joewils, hansthered
 Donate link: http://prefrent.com/
-Tags: match, sort, rank, related, relational, relate, related, tags, posts, post-types, types, ai, a.i., filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, listings, projects, big data, noise reduction, UIUX, enhance, improve, menu, menus, lists, products, saas
+Tags: match, sort, rank, related, relational, relate, tags, posts, post-types, types, ai, a.i., filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, 
 Requires at least: 3.6
-Tested up to: 3.9.1
-Stable tag: 0.7.1
+Tested up to: 4.0
+Stable tag: 0.9.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,22 +65,13 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. If a Distance is indicated, it is done in the same manner as a draw; -dogs5 (notice that it is preceded by a minus, “-“ and not a plus, “+”. An attenuation of “5” indicates the highest possible dislike. If there is no number, it’s value is considered to be “1”.
 1. If none of the Affinitomic™ Element fields are filled in, the page, post, or Archetype will not be effected by Affinitomics™ - JumpSearch will have no effect, and only shortcodes with overriding Affinitomics™ will function.
 
-= Use the following shortcodes on pages and in text widgets to display affinitomics = 
-
-- [afview] Tells Affinitomics to build a dynamic menu list. Without other parameters, it uses the affinitomics of the page to create the menu list.
-- [afview display_title="false"] Creates a dynamic menu without a title. The title displays by default and shows what Affinitomics were used as a criteria to create the menu list.
-- [afview affinitomics="+thisthing5,-thatthing5"] Tells affinitomics to build a menu list based on the discreet set of affinitomics “thisthing” and “thatching”. the “+” connotes a positive attraction (draw) and the “-” connotes a negative relationship, or distance.
-- [afview category_id="143"] Tells Affinitomics to build a menu list based on the affinitomics of the page, but to restrict the list to a particular category. In WordPress the category is listed in the admin dashboard.
-- [afview limit="4"] This tells Affinitomics to limit a menu list a specific number of items, in this case 4.
-
-= Use the following class' to style afview (shortcode) display =
-
-- afview
-- aftitle
-- afsubtitle
-- afelement
-- afelementurl
-- afelementscore
+=Use the following class' to style [afview] display=
+* afview
+* aftitle
+* afsubtitle
+* afelement
+* afelementurl
+* afelementscore
 
 == Frequently Asked Questions ==
 
@@ -111,22 +102,22 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Changelog ==
 
-= 0.7.1 =
-* Affinitomics support for Project and Listing post-types added
-* Google integration for Products, Projects, and Listings added
-* Better Shortcode execution
-* Better documentation
-* Bug fixes and minor enhancements
+=0.9.0=
+* Cleaned up admin settings
+* Improved uploading to cloud
+* Sped up oporations within Wordpress
+* Integration with Affinitomics Taxonomy Converter
+* Various bugfixes and improvements
 
-= 0.7.0 =
+=0.7.0=
 * CSS Styling hooks!
 * Support for WooCommerce!
 
-= 0.6.06 =
+=0.6.06=
 * Changes to internal documentation
 * Other little bug fixes/improvements
 
-= 0.6.05 =
+=0.6.05=
 * Corrections in readme.txt and documentation
 
 = 0.6.04 =
@@ -165,8 +156,8 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Upgrade Notice ==
 
-= 0.7.1 =
-Upgrade - GPLv2 license, Affinitomics™ Cloud storage, CSS Styling hooks, Project and Listing Post-Types, Shortcode enhancements.
+= 0.9.0 =
+Upgrade - GPLv2 license, Affinitomics™ Cloud storage improvements, speed enhancements, taxonomy converter integration.
 
 == Additional Information ==
 
