@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: ignitriun, joewils, hansthered
 Donate link: http://prefrent.com/
-Tags: match, sort, rank, related, relational, relate, tags, posts, post-types, types, ai, a.i., filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, 
+Tags: match, sort, rank, related, relational, relate, tags, posts, post-types, types, ai, a.i., artificial intelligence, filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, big data 
 Requires at least: 3.6
 Tested up to: 4.0
 Stable tag: 0.9.0
