@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.9.0
+Version: 0.9.6
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -147,7 +147,7 @@ function descriptor_taxonomy()  {
         'edit_item'                  => __( 'Edit Descriptor', 'text_domain' ),
         'update_item'                => __( 'Update Descriptor', 'text_domain' ),
         'separate_items_with_commas' => __( '<strong>Descriptors</strong> are similar to Categories in Wordpress. Separate
-                       each Descriptor with commas. <strong>e.g.</strong> Summer Activities, Hobbies', 
+                       each Descriptor with commas. <strong>e.g.</strong> Summer Activities, Hobbies',
                        'text_domain' ),
         'search_items'               => __( 'Search descriptors', 'text_domain' ),
         'add_or_remove_items'        => __( 'Add or remove descriptors', 'text_domain' ),
@@ -185,7 +185,7 @@ function draw_taxonomy()  {
         'edit_item'                  => __( 'Edit Draw', 'text_domain' ),
         'update_item'                => __( 'Update Draw', 'text_domain' ),
         'separate_items_with_commas' => __( '<strong>Syntax:</strong> Draws can have a magnitude from 1 to 5 written
-                       as a suffix, with each draw separated by a comma. If a magnitude is not present, 
+                       as a suffix, with each draw separated by a comma. If a magnitude is not present,
                        a magnitude of one will be assumed. <strong>e.g.</strong> Cats5, Laser Pointer2',
                        'text_domain' ),
         'search_items'               => __( 'Search draws', 'text_domain' ),
@@ -223,9 +223,9 @@ function distance_taxonomy()  {
         'add_new_item'               => __( 'Add New Distance', 'text_domain' ),
         'edit_item'                  => __( 'Edit Distance', 'text_domain' ),
         'update_item'                => __( 'Update Distance', 'text_domain' ),
-        'separate_items_with_commas' => __( '<strong>Syntax:</strong> Distances can have a magnitude of 1 to 5, written 
-                       as a suffix, with each distance separated by a comma. If a magnitude is not present, 
-                       a magnitude of one will be assumed. <strong>e.g.</strong> Nickelback5, Canada2', 
+        'separate_items_with_commas' => __( '<strong>Syntax:</strong> Distances can have a magnitude of 1 to 5, written
+                       as a suffix, with each distance separated by a comma. If a magnitude is not present,
+                       a magnitude of one will be assumed. <strong>e.g.</strong> Nickelback5, Canada2',
                        'text_domain' ),
         'search_items'               => __( 'Search Distance', 'text_domain' ),
         'add_or_remove_items'        => __( 'Add or remove Distance', 'text_domain' ),
@@ -467,7 +467,7 @@ function af_plugin_export() {
         }
         $cat_string = implode(",", $cats);
       }
-    
+
       // Collect draw terms from the post
       $these_draws = wp_get_post_terms( $id, "draw" );
       $draw_terms = array();
@@ -481,14 +481,14 @@ function af_plugin_export() {
       foreach ($these_distances as $distance) {
       array_push($distance_terms, $distance->name);
       }
-      
+
       // Collect descriptor terms from the post
       $these_descriptors = wp_get_post_terms( $id, "descriptor" );
       $descriptor_terms = array();
       foreach ($these_descriptors as $descriptor) {
       array_push($descriptor_terms, $descriptor->name);
       }
-  
+
       $affinitomics = array(
         'url' =>  get_permalink($id),
         'title' => get_the_title($id),
@@ -535,7 +535,7 @@ function af_plugin_export() {
   submit_button('Export');
   echo '</form>';
   echo '</div>';
-  
+
   if (is_plugin_active('affinitomics-taxonomy-converter/affinitomics-taxonomy-converter.php')) {
     echo '<a href="admin.php?import=wptaxconvertaffinitomics">Convert Taxonomy</a>';
   } else {
@@ -800,9 +800,9 @@ function af_search_content_filter( $content ) {
             if ( $this_weight > $best_draw_num ) {
               $best_draw = preg_replace("/[0-9]/", "", $draw->name);
               $best_draw_num = $this_weight;
-            } 
-          } 
-        } 
+            }
+          }
+        }
         else {
           $draw->name = preg_replace("/[0-9]/", "", $draw->name);
           array_push($draw_terms, $draw->name);
@@ -822,7 +822,7 @@ function af_search_content_filter( $content ) {
             $best_distance = preg_replace("/[0-9]/", "", $distance->name);
             $best_distance_num = $this_weight;
           }
-        } 
+        }
         else {
           $distance->name = preg_replace("/[0-9]/", "", $distance->name);
           array_push($distance_terms, $distance->name);
@@ -922,7 +922,7 @@ function af_search_content_filter( $content ) {
       $modified_content .= $content;
       if (get_option('af_jumpsearch_location') == 'bottom') $modified_content .= $cse;
       return $modified_content;
-    } 
+    }
   }
   return $content;
 }
