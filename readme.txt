@@ -1,22 +1,22 @@
 === Plugin Name ===
-Contributors: ignitriun, joewils, hansthered
+Contributors: Prefrent, joewils, hansthered
 Donate link: http://prefrent.com/
-Tags: match, sort, rank, related, relational, relate, tags, posts, post-types, types, ai, a.i., artificial intelligence, filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, big data 
+Tags: match, sort, rank, related, related posts, relational, relate, tags, posts, post-types, types, ai, a.i., artificial intelligence, filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, parse, discover, classifier,  
 Requires at least: 3.6
-Tested up to: 4.0
-Stable tag: 0.9.0
+Tested up to: 4.1
+Stable tag: 0.9.6
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse.
+Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse without killing your server.
 
 == Description ==
 
-Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse.
+Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse in minutes.
 
-Using patent-pending feature/tag dimensionalization methods, the plugin creates AI constructs from pages, posts, and custom post types. These constructs are then used to allow information to self-organize based on contextual value. This makes link lists and menus contextual and dynamic - making sites sticky and visitors more likely to convert. Applied to searches (Google CSE), Affinitomics improves results by as much as 9x, imparting context and reducing noise.
+Using patent-pending feature/tag dimensionalization methods within the Affinitomics Cloud, the plugin creates AI constructs from pages, posts, and custom post types. These constructs are then used to allow information to self-organize based on contextual value. This makes link lists and menus contextual and dynamic - making sites sticky and visitors more likely to convert. Applied to searches (Google CSE), Affinitomics improves results by as much as 9x, imparting context and massively reducing noise.
 
-Categories and traditional tags create flat index structures that little actual relational value. Some plugins try to impart contextual value by either requiring hard-coded relationships or forcing Wordpress to calculate tag counts and concordances in an effort to find contextually valuable matches. Plugins that do the latter cause Wordpress to perform tens of thousands more calculations than normal, bogging servers and slowing performance. Some hosts have banned the use of these plugins.
+Categories and traditional tags create flat index structures with little actual relational value. Some plugins try to impart contextual value by either requiring hard-coded relationships or forcing Wordpress to calculate tag counts and concordances in an effort to find contextually valuable matches. Plugins that do the latter cause Wordpress to perform tens of thousands more calculations than normal, bogging servers and slowing performance. Some hosts have banned the use of these plugins.
 
 Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinitomics™ Cloud, storing AI constructs, and calculating contextual relationships and values. Free of the the computational load, Wordpress benefits, becoming a hyper-contextual information system that dynamically molds itself to the users needs.
 
@@ -28,16 +28,17 @@ Affinitomics™ for Wordpress uses a RESTful API to communicate with the Affinit
 1. Activate the plugin through the Plugins menu in WordPress.
 1. Go to “Affinitomics™” in the left hand control menu.
 1. Select “settings” from the bottom of the list.
-1. Generate and input an Affinitomics™ API key. Save this key someplace secure – it can’t be retrieved. You can use the link in the plugin, or you can get it here
-1. Configure Affintomics™ for your site. If you intend to use JumpSearch
+1. On first use, the plugin generates an anonymous API key that allows it to communicate securely with the Affinitomics Cloud
+1. Registering the plugin grants use of a valuable dashboard that allows users to view and manage Affinitomic Transactions
+1. Configure Affintomics™ for your site.
 
 = Configure Affinitomics =
 
 1. Install the plugin
 1. In the admin panel, find the “Affinitomics” menu (usually below Posts) and select “settings”
 1. Make sure that the field for “Affinitomics™ API URL” contains “http://data.prefrent.com”
-1. Now you’ll need an API key - in a separate browser window, go to “http://prefrent.com/get-api-key/“ - put in the domain name of your site without the http://, example subdomain.domain.com or domain.com/my-site. This and your email address register the API key for your site. 
-1. From the resulting page, copy the API key and API domain to the API Key and Domain fields in your settings.
+1. Make sure that there is an API key present in the field. If the field is empty, or no key is recognized, register the plugin and claim your key via http://affinitomics.com/register 
+1. From the resulting page, copy the API key and paste it in the API field in your settings.
 1. Next, under “To which Post-types would you like to apply your Affinitomics™?” check the boxes for the post-types you want to use with Affinitomics.
 1. Now scroll to the bottom and save changes. Unless you want to configure Google Custom Search (CSE) to work with Affinitomics, you’re done.
 
@@ -81,7 +82,7 @@ Affinitomics™ requires Wordpress 3.5 or better, and php 5.3 or better.
 
 = How much storage do I get in the Affinitomics™ Cloud =
 
-Users are granted space for 1000 Affinitomic™ constructs and transactions of 50,000 pageviews per month.
+Users are granted space for 1000 Affinitomic™ constructs and 5,000 transactions per month.
 Larger accounts are available at [Prefrent.com](http://prefrent.com). 
 
 = How many “Archetypes” will I need? =
@@ -91,8 +92,7 @@ So 1000 archetypes could be 50 pages, 900 posts, and 50 ads if you didn’t assi
 
 == Screenshots ==
 
-1. This shows the settings area under Archetype > settings. Note that the plugin requires and API key from Prefrent.
-for Jump-search functionality, credentials are required form Google as well.
+1. This shows the settings area under Archetype > settings. Note that the plugin requires and API key from Prefrent. for Jump-search functionality, credentials are required form Google as well.
 
 2. This shows the descriptor, draw, and distance fields and how they are utilized.
 
@@ -102,12 +102,24 @@ for Jump-search functionality, credentials are required form Google as well.
 
 == Changelog ==
 
+=0.9.6=
+* Connected to new Affinitomics Cloud
+* Improved communication with Cloud
+* Refactored the plugin
+* Changed meta-boxes
+* Deprecated some short-codes
+
+
 =0.9.0=
 * Cleaned up admin settings
 * Improved uploading to cloud
 * Sped up oporations within Wordpress
 * Integration with Affinitomics Taxonomy Converter
 * Various bugfixes and improvements
+
+=0.9.0=
+* Corrected issue syncing with cloud
+* Fixed bug related to implementation of CSE
 
 =0.7.0=
 * CSS Styling hooks!

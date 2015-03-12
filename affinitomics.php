@@ -389,7 +389,9 @@ function afview_function($atts) {
 
       // Valid Post?
       $post_title = get_post_field('post_title', $raf['element']['uid']);
-      if (is_wp_error($post_title) || get_post_status( $raf['element']['uid'] ) == "trash") {
+      $this_post_title = get_post_field('post_title', $post_id);
+
+      if (is_wp_error($post_title) || $post_title == $this_post_title || get_post_status( $raf['element']['uid'] ) == "trash") {
         $process_element = false;
       }
       // Categories
