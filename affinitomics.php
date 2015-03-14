@@ -36,25 +36,77 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 /* Save Action */
 add_action( 'save_post', 'afpost_save_postdata' );
+global $afview_count;
+$afview_count = 0;
+add_action( 'init', 'my_script_enqueuer' );
+
+function my_script_enqueuer() {
+   wp_register_script( "affinitomics_ajax_script", WP_PLUGIN_URL.'/affinitomics/affinitomics_ajax_script.js', array('jquery') );
+   wp_localize_script( 'affinitomics_ajax_script', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
+
+   wp_enqueue_script( 'jquery' );
+   wp_enqueue_script( 'affinitomics_ajax_script' );
+
+}
+
+function custom_restore_function($post_ID) {
+  $the_key = get_option('af_key');
+  $af_cloud_url = get_option('af_cloud_url', '');
+  $url = get_permalink($post_ID);
+  $request = curl_request($af_cloud_url . "/api/restore_resource?user_key=" . $the_key . '&uid=' . $post_ID . '&url=' . $url);
+}
+
+add_action('untrash_post', 'custom_restore_function');
 
 /* Page Types to Apply Affinitomics */
 $screens = array();
-if (get_option('af_post_type_affinitomics','true') == 'true') $screens[] = 'archetype';
+// if (get_option('af_post_type_affinitomics','true') == 'true') $screens[] = 'archetype';
 if (get_option('af_post_type_posts','false') == 'true') $screens[] = 'post';
 if (get_option('af_post_type_pages','false') == 'true') $screens[] = 'page';
 if (get_option('af_post_type_products','false') == 'true') $screens[] = 'product';
 if (get_option('af_post_type_projects','false') == 'true') $screens[] = 'project';
 if (get_option('af_post_type_listings','false') == 'true') $screens[] = 'listing';
 
-/* Save Custom DATA */
-function afpost_save_postdata( $post_id = null ) {
+add_action('admin_menu', 'remove_extra_submenu_items');
 
-  // Get Post ID if not passed in
-  if($post_id == null){
-    $post_ID = $_POST['post_ID'];
-  } else {
-    $post_ID = $post_id;
+function remove_extra_submenu_items() {
+  global $submenu;
+  unset($submenu["edit.php?post_type=archetype"][10]);
+  unset($submenu["edit.php?post_type=archetype"][5]);
+}
+
+function af_verify_key(){
+  $the_key = get_option('af_key');
+  $af_cloud_url = get_option('af_cloud_url', '');
+
+  if (!isset($the_key) || $the_key == ""){
+    $request = curl_request($af_cloud_url . "/api/anon_key");
+    $response = json_decode($request, true);
+    update_option( 'af_key' , $response['data']['anon_key'] );
   }
+}
+
+function af_check_for_errors(){
+  $the_key = get_option('af_key');
+  $af_cloud_url = get_option('af_cloud_url', '');
+
+  $request = curl_request($af_cloud_url . "/check_for_errors?user_key=" . $the_key);
+  $response = json_decode($request, true);
+  update_option( 'af_errors' , $response['data']['af_errors'] );
+  update_option( 'af_error_code' , $response['data']['af_error_code'] );
+}
+
+function af_verify_provider(){
+  update_option( 'af_cloud_url' , 'vast-savannah-3299.herokuapp.com' );
+  // update_option( 'af_cloud_url' , 'localhost:3000' );
+}
+
+/* Save Custom DATA */
+function afpost_save_postdata() {
+  af_verify_key();
+  af_verify_provider();
+  $post_ID = get_the_id();
+  $post_status = get_post_status($post_ID);
 
   // Collect descriptor terms from the post
   $these_descriptors = wp_get_post_terms( $post_ID, "descriptor" );
@@ -109,16 +161,17 @@ function afpost_save_postdata( $post_id = null ) {
       'url' =>  get_permalink($post_ID),
       'title' => get_the_title($post_ID),
       'descriptors' => $afpost_descriptors,
-      'draw' => $afpost_draw,
-      'distance' => $afpost_distance,
-      'domain' => get_option('af_domain'),
+      'draws' => $afpost_draw,
+      'distances' => $afpost_distance,
       'key' => get_option('af_key'),
       'uid' => $post_ID,
-      'category' => $cat_string
+      'category' => $cat_string,
+      'status' => $post_status
     );
     if ($afid) $affinitomics['afid'] = $afid;
-    $af_cloud_url = get_option('af_cloud_url');
-    $request = curl_request($af_cloud_url.'/v1/post/affinitomics/', $affinitomics);
+    $af_cloudify_url = get_option('af_cloud_url') . '/api/affinitomics/cloudify/' . get_option('af_key') . '/';
+    $request = curl_request($af_cloudify_url, $affinitomics);
+
     $af = json_decode($request, true);
     if (isset($af['data']['objectId'])) {
       update_post_meta($post_ID, 'afid', $af['data']['objectId']);
@@ -258,8 +311,8 @@ Register "Archetype" post type
 function arche_type() {
 
   $labels = array(
-    'name'                => _x( 'Archetypes', 'Post Type General Name', 'text_domain' ),
-    'singular_name'       => _x( 'Archetype', 'Post Type Singular Name', 'text_domain' ),
+    'name'                => __( 'Archetypes', 'Post Type General Name', 'text_domain' ),
+    'singular_name'       => __( 'Archetype', 'Post Type Singular Name', 'text_domain' ),
     'menu_name'           => __( 'Affinitomics&trade;', 'text_domain' ),
     'parent_item_colon'   => __( 'Parent Archetype:', 'text_domain' ),
     'all_items'           => __( 'All Archetypes', 'text_domain' ),
@@ -296,13 +349,19 @@ function arche_type() {
 
 }
 
-// Hook into the 'init' action
+// // Hook into the 'init' action
 add_action( 'init', 'arche_type', 0 );
 
 /*
 ----------------------------------------------------------------------
 RELATED POSTS SHORTCODE
-Example: [afview], [afview affinitomics="+foo -bar"], [afview limit="4"], or [afview category_id="42"].
+Custom affinitomics:
+ Use + for a draw
+ Use - for a distance
+ Use just the word for a descriptor
+ Separate terms with a comma
+Examples: [afview], [afview affinitomics="+foo, +quux4, -bar, baz"], [afview limit="4"],
+          [afview limit=1 display_title="false"]
 ----------------------------------------------------------------------
 */
 
@@ -317,19 +376,21 @@ function afview_handler( $atts, $content = null ) {
 
 //process shortcode
 function afview_function($atts) {
+  af_verify_key();
+  af_verify_provider();
+
   global $screens;
   extract( shortcode_atts( array(
-      //'title' => null,
-      'affinitomics' => null,
-      'display_title' => 'true',
-      'limit' => 10,
-      'debug' => false,
-      'category_id' => null,
-      'post_type' => null
+      'affinitomics'    => null,
+      'display_title'   => 'true',
+      'limit'           => 10,
+      'category_filter' => ''
   ), $atts ) );
 
   // Start output
-  $afview_output = '<div class="afview">';
+  // $afview_output = '<div class="afview">';
+  $afview_output = '';
+
   $post_id = get_the_ID();
   $afid = get_post_meta($post_id, 'afid', true);
   $af_domain = get_option('af_domain');
@@ -337,15 +398,29 @@ function afview_function($atts) {
 
   // Find Related Elements
   if ($afid) {
-    $af_cloud_url = get_option('af_cloud_url');
-    $af_cloud = $af_cloud_url.'/v1/related/affinitomics/?afid='.$afid.'&domain='.$af_domain.'&key='.$af_key;
+
+    $af_cloud = get_option('af_cloud_url') . '/api/affinitomics/related/' . $af_key . '?afid=' . $afid . '&limit=' . $limit . '&category_filter=' . $category_filter;
     if ($affinitomics) {
       $af_cloud = $af_cloud . '&af=' . rawurlencode($affinitomics);
     }
-    $request = file_get_contents($af_cloud, false);
-    $af = json_decode($request, true);
-    //$afview_output .= '<!-- '.$af_cloud.' -->';
+
+    global $afview_count;
+    $afview_count ++;
+
+    if ($display_title == 'true') {
+      $afview_output .= '<h2 class="aftitle">Related Items: ';
+
+      // These are the custom affinitomics
+      if ($affinitomics) {
+        $afview_output .= $affinitomics;
+      }
+
+      $afview_output .= ' <i class="afsubtitle">(sorted by Affinitomic concordance)</i></h2>';
+    }
+
+    $afview_output .= '<input type="hidden" name="af_view_placeholder" value="' . $af_cloud . '" id="af_view_' . $afview_count . '">';
   }
+
   // HTML Output
   /*
   <div class="afview">
@@ -368,50 +443,7 @@ function afview_function($atts) {
     </ul>
   </div>
   */
-  if ($af['list']) {
-    if ($display_title == 'true') {
-      if ($affinitomics) {
-        $afview_output .= '<h2 class="aftitle">Related Items: '. $affinitomics;
-      } else {
-        $afview_output .= '<h2 class="aftitle">Related Items: '. $af['list'];
-      }
-      $afview_output .= ' <i class="afsubtitle">(sorted by Affinitomic concordance)</i></h2>';
-    }
-    // Loop Thru Elements
-    $html_list = '<ul class="aflist">';
-    $html_list_count = 0;
-    foreach ($af['related'] as $raf) {
-      $process_element = true;
-      // Unique Identifier?
-      if (!isset($raf['element']['uid'])) {
-        $process_element = false;
-      }
 
-      // Valid Post?
-      $post_title = get_post_field('post_title', $raf['element']['uid']);
-      $this_post_title = get_post_field('post_title', $post_id);
-
-      if (is_wp_error($post_title) || $post_title == $this_post_title || get_post_status( $raf['element']['uid'] ) == "trash") {
-        $process_element = false;
-      }
-      // Categories
-      $raf_cats = array();
-      if ($raf['element']['category']) $raf_cats = explode(',',$raf['element']['category']);
-      // Filter by Category?
-      if ($category_id && ( !in_array($category_id, $raf_cats)) ) {
-        $process_element = false;
-      }
-      // Process Element?
-      if ($process_element) {
-        if ($html_list_count < $limit) {
-          $html_list_count++;
-          $html_list .= '<li class="afelement"><a href="'.$raf['element']['url'].'" class="afelementurl"><span class="afelementtitle">'.$raf['element']['title'].'</span></a> <span class="afelementscore">('.$raf['score'].')</span></li>';
-        }
-      }
-    }
-    $html_list .= '</ul>';
-    $afview_output .= $html_list . '</div>';
-  }
   return $afview_output;
 }
 /*
@@ -441,86 +473,28 @@ function af_plugin_export() {
     wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
   }
 
+  af_verify_key();
+  af_verify_provider();
+
   // Export to Cloud
   if (isset($_POST['af_cloudify']) && $_POST['af_cloudify'] == 'true')  {
-    echo '<h1>Export</h1>';
-    global $screens;
-    $args = array(
-      'post_type' => $screens,
-      'category'=>$category_id,
-      'posts_per_page' => -1
-    );
-    $posts_array = get_posts($args);
-    echo '<ol>';
-    $nothing_to_export = true;
-    foreach($posts_array as $post) {
-      $id = $post->ID;
-      $afid = get_post_meta($id, 'afid', true);
-      if ($afid) continue;
-      $nothing_to_export = false;
-      $cat_string = '';
-      $categories = get_the_category($id);
-      if ($categories) {
-        $cats = array();
-        foreach($categories as $cat) {
-          $cats[] = $cat->term_id;
-        }
-        $cat_string = implode(",", $cats);
-      }
-
-      // Collect draw terms from the post
-      $these_draws = wp_get_post_terms( $id, "draw" );
-      $draw_terms = array();
-      foreach ($these_draws as $draw) {
-      array_push($draw_terms, $draw->name);
-      }
-
-      // Collect distance terms from the post
-      $these_distances = wp_get_post_terms( $id, "distance" );
-      $distance_terms = array();
-      foreach ($these_distances as $distance) {
-      array_push($distance_terms, $distance->name);
-      }
-
-      // Collect descriptor terms from the post
-      $these_descriptors = wp_get_post_terms( $id, "descriptor" );
-      $descriptor_terms = array();
-      foreach ($these_descriptors as $descriptor) {
-      array_push($descriptor_terms, $descriptor->name);
-      }
-
-      $affinitomics = array(
-        'url' =>  get_permalink($id),
-        'title' => get_the_title($id),
-        'descriptors' => implode(',', $descriptor_terms),
-        'draw' => implode(',', $draw_terms),
-        'distance' => implode(',', $distance_terms),
-        'afid' => $afid,
-        'domain' => get_option('af_domain'),
-        'key' => get_option('af_key'),
-        'uid' => $id,
-        'category' => $cat_string
-      );
-
-      if ($affinitomics['descriptors'] || $affinitomics['draw'] || $affinitomics['distance']) {
-        $af_cloud_url = get_option('af_cloud_url');
-        $request = curl_request($af_cloud_url.'/v1/post/affinitomics/', $affinitomics);
-        $af = json_decode($request, true);
-        echo '<li>';
-        print_r($request);
-        print_r($affinitomics);
-        echo '</li>';
-        // Update Post
-        if (isset($af['data']['objectId'])) {
-          update_post_meta($id, 'afid', $af['data']['objectId']);
-        }
-      }
-    }
-    if ($nothing_to_export) {
-      echo 'Everything is already synced!';
-    }
-    echo '</ol>';
+    echo '<input type="hidden" id="af_cloud_sync_go" value="yes">';
   }
+
+  echo '<h1 id="cloud_sync_heading">Export</h1>';
+  global $screens;
+  $args = array(
+    'post_type'      => $screens,
+    'category'       => $category_id,
+    'posts_per_page' => -1
+  );
+  $posts_array = get_posts($args);
+  echo '<input type="hidden" value="' . sizeof($posts_array) . '" id="total_items_to_sync">';
+  echo '<ol class="cloud_sync_ol">';
+  foreach($posts_array as $post) {
+    place_jquery_tag($post);
+  }
+  echo '</ol>';
 
   // Default View
   echo '<div class="wrap">';
@@ -539,8 +513,72 @@ function af_plugin_export() {
   if (is_plugin_active('affinitomics-taxonomy-converter/affinitomics-taxonomy-converter.php')) {
     echo '<a href="admin.php?import=wptaxconvertaffinitomics">Convert Taxonomy</a>';
   } else {
-    // When we publish the plugin we should change this to a hyperlink, currently we do not have the URL
-  echo 'Hey, did you know we have a handy importing tool? Check out the "Affinitomics Taxonomy Converter" ';
+  echo 'Hey, did you know we have a handy importing tool? Check out the ';
+  echo '<a href="https://wordpress.org/plugins/affinitomics-taxonomy-converter/" target="_blank">Affinitomics Taxonomy Converter</a>';
+  }
+}
+
+function place_jquery_tag($post){
+  $id = $post->ID;
+  $afid = get_post_meta($id, 'afid', true);
+  $cat_string = '';
+  $categories = get_the_terms( $id, 'category' );
+
+  if ($categories) {
+    $cats = array();
+    foreach($categories as $cat) {
+      $cats[] = $cat->term_id;
+    }
+    $cat_string = implode(",", $cats);
+  }
+
+  // Collect draw terms from the post
+  $these_draws = wp_get_post_terms( $id, "draw" );
+  $draw_terms = array();
+  foreach ($these_draws as $draw) {
+  array_push($draw_terms, $draw->name);
+  }
+
+  // Collect distance terms from the post
+  $these_distances = wp_get_post_terms( $id, "distance" );
+  $distance_terms = array();
+  foreach ($these_distances as $distance) {
+  array_push($distance_terms, $distance->name);
+  }
+
+  // Collect descriptor terms from the post
+  $these_descriptors = wp_get_post_terms( $id, "descriptor" );
+  $descriptor_terms = array();
+  foreach ($these_descriptors as $descriptor) {
+  array_push($descriptor_terms, $descriptor->name);
+  }
+
+  $post_status = get_post_status($id);
+
+  $affinitomics = array(
+    'url' =>  get_permalink($id),
+    'title' => get_the_title($id),
+    'descriptors' => implode(',', $descriptor_terms),
+    'draws' => implode(',', $draw_terms),
+    'distances' => implode(',', $distance_terms),
+    'uid' => $id,
+    'category' => $cat_string,
+    'status' => $post_status
+  );
+
+  if ($affinitomics['descriptors'] || $affinitomics['draws'] || $affinitomics['distances']) {
+    $af_cloud_url = get_option('af_cloud_url') . '/api/affinitomics/cloudify/' . get_option('af_key') . '/?';
+
+    $af_cloud_url .= '&url=' . get_permalink($id);
+    $af_cloud_url .= '&title=' . get_the_title($id);
+    $af_cloud_url .= '&descriptors=' . implode(',', $descriptor_terms);
+    $af_cloud_url .= '&draws=' . implode(',', $draw_terms);
+    $af_cloud_url .= '&distances=' . implode(',', $distance_terms);
+    $af_cloud_url .= '&uid=' . $id;
+    $af_cloud_url .= '&category=' . $cat_string;
+    $af_cloud_url .= '&status=' . $post_status;
+
+    echo '<input type="hidden" name="af_cloud_sync_placeholder" value="' . $af_cloud_url . '">';
   }
 }
 
@@ -548,33 +586,49 @@ function af_plugin_options() {
   if ( !current_user_can( 'manage_options' ) )  {
     wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
   }
+
+  af_verify_key();
   echo '<div class="wrap">';
   echo '<h2>Affinitomics Plugin Settings</h2>';
   echo '<form method="post" action="options.php">';
   settings_fields( 'af-settings-group' );
   do_settings_sections( 'af-settings-group' );
-  $count_posts = wp_count_posts();
-  if ($count_posts->publish > 10000) {
-    echo '<h3>Affinitomic License Exceeded.</h3>';
-    echo '<p>Please Contact Prefrent For Expanded Post Coverage.</p>';
-    echo '<hr>';
+
+  af_verify_provider();
+  af_check_for_errors();
+  $af_errors = get_option('af_errors', '');
+  $af_error_code = get_option('af_error_code', '');
+
+  if(strlen($af_errors) > 0) {
+    echo '<h3 style="color:red;font-weight:bold;">----- Warning -----</h3>';
+    echo '<p>Error Message: ' . $af_errors . '</p>';
+    echo '<p>Error Code: ' . $af_error_code . '</p>';
+    echo '<h3 style="color:red;font-weight:bold;">----- Warning -----</h3>';
   }
 /*
 Affinitomics Commercial Code
 */
 
-  $af_cloud_url = get_option('af_cloud_url', '');
-  echo '<h4>Affinitomics&trade; API URL</h4>';
-  echo '<input type="text" name="af_cloud_url" value="'.$af_cloud_url.'" />';
-
   $af_key = get_option('af_key', '');
+  $af_cloud_url = get_option('af_cloud_url', '');
+
   echo '<h4>Affinitomics&trade; API Key</h4>';
   echo '<input type="text" name="af_key" value="'.$af_key.'" />';
+  echo '<p>';
 
-  $af_domain = get_option('af_domain', '');
-  echo '<h4>Affinitomics&trade; Account Domain Name</h4>';
-  echo '<input type="text" name="af_domain" value="'.$af_domain.'" />';
-  echo '<h4>Need an API key? Get it <a href="http://prefrent.com/get-api-key/" target="_blank">here</a></h4>';
+  if(strlen($af_key) == 60){
+    echo 'Anonymous Account - Register for free and see in-depth reporting!<br>';
+    echo '<a href="http://' . $af_cloud_url . '/users/sign_up?key=' . $af_key . '" target="_blank">Register for Free</a>';
+  } elseif (strlen($af_key) == 64) {
+    echo 'Legacy User Account - Create your user account for free and see in-depth reporting!<br>';
+    echo '<a href="http://' . $af_cloud_url . '/users/sign_up?key=' . $af_key . '" target="_blank">Register for Free</a>';
+  } elseif (strlen($af_key) > 64) {
+    echo 'Registered User<br>';
+    echo '<a href="http://' . $af_cloud_url . '/dashboards/user" target="_blank">View usage statistics</a>';
+  } else {
+    echo 'API Key Unrecognized...';
+  }
+  echo '</p>';
 
   $af_post_type_affinitomics = get_option('af_post_type_affinitomics');
   $af_post_type_posts = get_option('af_post_type_posts');
@@ -595,7 +649,6 @@ Affinitomics Commercial Code
   if ($af_post_type_projects == 'true') $af_post_type_projects_checked = 'checked="checked"';
   if ($af_post_type_listings == 'true') $af_post_type_listings_checked = 'checked="checked"';
   echo '<h3>To which Post-types would you like to apply your Affinitomics&trade;?</h3>';
-  echo '<input type="checkbox" name="af_post_type_affinitomics" value="true" '.$af_post_type_affinitomics_checked.' /> Affinitomic&trade; Archetypes<br />';
   echo '<input type="checkbox" name="af_post_type_posts" value="true" '.$af_post_type_posts_checked.'/> Posts<br />';
   echo '<input type="checkbox" name="af_post_type_pages" value="true" '.$af_post_type_pages_checked.'/> Pages<br />';
   echo '<input type="checkbox" name="af_post_type_products" value="true" '.$af_post_type_products_checked.'/> Products<br />';
@@ -644,7 +697,6 @@ Affinitomics Commercial Code
   if ($af_jumpsearch_post_type_projects == 'true') $af_jumpsearch_post_type_projects_checked = 'checked="checked"';
   if ($af_jumpsearch_post_type_listings == 'true') $af_jumpsearch_post_type_listings_checked = 'checked="checked"';
   echo '<h4>Which Pages or Post-types should have a JumpSearch field?</h4>';
-  echo '<input type="checkbox" name="af_jumpsearch_post_type_affinitomics" value="true"  '.$af_jumpsearch_post_type_affinitomics_checked.' /> Affinitomic&trade; Archetypes<br />';
   echo '<input type="checkbox" name="af_jumpsearch_post_type_posts" value="true" '.$af_jumpsearch_post_type_posts_checked.'/> Posts<br />';
   echo '<input type="checkbox" name="af_jumpsearch_post_type_pages" value="true" '.$af_jumpsearch_post_type_pages_checked.'/> Pages<br />';
   echo '<input type="checkbox" name="af_jumpsearch_post_type_products" value="true" '.$af_jumpsearch_post_type_products_checked.'/> Products<br />';
@@ -686,6 +738,8 @@ function af_register_settings() {
   register_setting('af-settings-group', 'af_jumpsearch_post_type_posts');
   register_setting('af-settings-group', 'af_jumpsearch_post_type_pages');
   register_setting('af-settings-group', 'af_jumpsearch_location');
+  register_setting('af-settings-group', 'af_errors');
+  register_setting('af-settings-group', 'af_error_code');
   register_setting('af-cloud-settings-group', 'af_cloudify');
 }
 
@@ -730,24 +784,21 @@ function this_page_search_enabled(){
   $this_page_type = get_post_type( get_the_ID() );
 
   switch ($this_page_type) {
-      case 'archetype':
-          return get_option('af_jumpsearch_post_type_affinitomics');
-          break;
-      case 'post':
-          return get_option('af_jumpsearch_post_type_posts');
-          break;
-      case 'page':
-          return get_option('af_jumpsearch_post_type_pages');
-          break;
-      case 'product':
-        return get_option('af_jumpsearch_post_type_products');
+    case 'post':
+        return get_option('af_jumpsearch_post_type_posts');
         break;
-      case 'project':
-        return get_option('af_jumpsearch_post_type_projects');
+    case 'page':
+        return get_option('af_jumpsearch_post_type_pages');
         break;
-      case 'listing':
-        return get_option('af_jumpsearch_post_type_listings');
-        break;
+    case 'product':
+      return get_option('af_jumpsearch_post_type_products');
+      break;
+    case 'project':
+      return get_option('af_jumpsearch_post_type_projects');
+      break;
+    case 'listing':
+      return get_option('af_jumpsearch_post_type_listings');
+      break;
   }
 
 }
