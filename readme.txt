@@ -12,8 +12,9 @@ Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and in
 
 == Description ==
 
-*This is the last supported version of Affinitomics for Wordpress. It has been replaced by ai•mojo!*
-[“ai•mojo” (free, by Prefrent)](https://wordpress.org/plugins/aimojo/)Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse in minutes.
+=This is the last supported version of Affinitomics for Wordpress. It has been replaced by ai•mojo!=
+
+[“ai•mojo” (free, by Prefrent)] (https://wordpress.org/plugins/aimojo/)Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse in minutes.
 
 Using patent-pending feature/tag dimensionalization methods within the Affinitomics Cloud, the plugin creates AI constructs from pages, posts, and custom post types. These constructs are then used to allow information to self-organize based on contextual value. This makes link lists and menus contextual and dynamic - making sites sticky and visitors more likely to convert. Applied to searches (Google CSE), Affinitomics improves results by as much as 9x, imparting context and massively reducing noise.
 
