@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.9.6
+Version: 1.0.0
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -98,7 +98,6 @@ function af_check_for_errors(){
 
 function af_verify_provider(){
   update_option( 'af_cloud_url' , 'vast-savannah-3299.herokuapp.com' );
-  // update_option( 'af_cloud_url' , 'localhost:3000' );
 }
 
 /* Save Custom DATA */
@@ -202,7 +201,7 @@ function descriptor_taxonomy()  {
         'separate_items_with_commas' => __( '<strong>Descriptors</strong> are similar to Categories in Wordpress. Separate
                        each Descriptor with commas. <strong>e.g.</strong> Summer Activities, Hobbies',
                        'text_domain' ),
-        'search_items'               => __( 'Search descriptors', 'text_domain' ),
+        'search_items'               => __( 'Search descriptors', 'affinitomics' ),
         'add_or_remove_items'        => __( 'Add or remove descriptors', 'text_domain' ),
         'choose_from_most_used'      => __( 'Choose from the most used Descriptors', 'text_domain' ),
     );
@@ -241,7 +240,7 @@ function draw_taxonomy()  {
                        as a suffix, with each draw separated by a comma. If a magnitude is not present,
                        a magnitude of one will be assumed. <strong>e.g.</strong> Cats5, Laser Pointer2',
                        'text_domain' ),
-        'search_items'               => __( 'Search draws', 'text_domain' ),
+        'search_items'               => __( 'Search draws', 'affinitomics' ),
         'add_or_remove_items'        => __( 'Add or remove draws', 'text_domain' ),
         'choose_from_most_used'      => __( 'Choose from the most used Draws', 'text_domain' ),
     );
@@ -280,7 +279,7 @@ function distance_taxonomy()  {
                        as a suffix, with each distance separated by a comma. If a magnitude is not present,
                        a magnitude of one will be assumed. <strong>e.g.</strong> Nickelback5, Canada2',
                        'text_domain' ),
-        'search_items'               => __( 'Search Distance', 'text_domain' ),
+        'search_items'               => __( 'Search distances', 'affinitomics' ),
         'add_or_remove_items'        => __( 'Add or remove Distance', 'text_domain' ),
         'choose_from_most_used'      => __( 'Choose from the most used Distances', 'text_domain' ),
     );
@@ -338,7 +337,7 @@ function arche_type() {
     'show_in_nav_menus'   => true,
     'show_in_admin_bar'   => true,
     'menu_position'       => 5,
-    'menu_icon'           => '/wp-content/plugins/affinitomics/affinitomics-favicon.png',
+    'menu_icon'           => plugins_url( 'affinitomics-favicon.png', __FILE__ ),
     'can_export'          => true,
     'has_archive'         => true,
     'exclude_from_search' => false,
@@ -355,12 +354,7 @@ add_action( 'init', 'arche_type', 0 );
 /*
 ----------------------------------------------------------------------
 RELATED POSTS SHORTCODE
-Custom affinitomics:
- Use + for a draw
- Use - for a distance
- Use just the word for a descriptor
- Separate terms with a comma
-Examples: [afview], [afview affinitomics="+foo, +quux4, -bar, baz"], [afview limit="4"],
+Examples: [afview], [afview limit="4"], [afview category_filter="50"]
           [afview limit=1 display_title="false"]
 ----------------------------------------------------------------------
 */
@@ -963,7 +957,7 @@ function af_search_content_filter( $content ) {
         $cse .= 'document.getElementById("search-content").innerHTML += "<li>No results found.</li>";';
         $cse .= "}\n";
         $cse .= "}\n";
-        $cse .= "document.write(\"<script src='\"+\"https://www.googleapis.com/customsearch/v1?key=\"+key+\"&cx=\"+cx+\"&q=\"+q+\" \"+a+\"&callback=gcs\"+\"'><\/script>\");\n";
+        $cse .= "document.write(\"<script src='\"+\"https://www.googleapis.com/customsearch/v1?key=\"+key+\"&cx=\"+cx+\"&q=\"+q+\" \"+a+\"&callback=gcs\"+\"'><\/sc\"+\"ript>\");\n";
         $cse .= "</script>\n";
       }
       $cse .= '</div><!-- af-search -->';
@@ -1000,5 +994,3 @@ function curl_request($url,$postdata=false) {
   curl_close($ch);
   return $response;
 }
-
-?>
