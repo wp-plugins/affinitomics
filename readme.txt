@@ -8,9 +8,8 @@ Stable tag: 0.9.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse without killing your server.
-**Replaced by ai•mojo**
-[“ai•mojo” (free, by Prefrent)] (https://wordpress.org/plugins/aimojo/)Affinitomics™
+Replaced by ai•mojo™
+Transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse.[“ai•mojo” (free, by Prefrent)] (https://wordpress.org/plugins/aimojo/)Affinitomics™
 
 == Description ==
 
