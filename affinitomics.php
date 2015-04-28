@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.9.7
+Version: 0.9.7.1
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -605,7 +605,9 @@ Affinitomics Commercial Code
 
   $af_key = get_option('af_key', '');
   $af_cloud_url = get_option('af_cloud_url', '');
-
+  echo '<hr align="left" style="height:2px; width: 710px; border:1px; color:red; background-color:red;">';
+  echo '<span style="line-height: 150%; color: red; font-size: 150%">This is the last supported version of Affinitomics for Wordpress&trade;.</span> <br /><span> <span style="font-size: 120%; line-height: 130%; color: gray;" ><strong><a href="http://wordpress.org/plugins/aimojo/">Please upgrade to aimojo&trade; here</a></strong> for continued support and development. It\'s free too!</span>';
+  echo '<hr align="left" style="height:2px; width: 710px; border:1px; color:red; background-color:red;">';
   echo '<h4>Affinitomics&trade; API Key</h4>';
   echo '<input type="text" name="af_key" value="'.$af_key.'" />';
   echo '<p>';

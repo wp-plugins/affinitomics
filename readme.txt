@@ -3,8 +3,8 @@ Contributors: Prefrent, joewils, hansthered
 Donate link: http://prefrent.com/
 Tags: match, sort, rank, related, related posts, relational, relate, tags, posts, post-types, types, ai, a.i., artificial intelligence, filter, filtering, micro format, context, contextual, contextually, search, data, freeform, construct, descriptors, draws, distance, support-vector, parse, discover, classifier, amigo, ai mojo
 Requires at least: 3.6
-Tested up to: 4.1.1
-Stable tag: 0.9.7
+Tested up to: 4.2
+Stable tag: 0.9.7.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-=This is the last supported version of Affinitomics for Wordpress. It has been replaced by ai•mojo!=
+= This is the last supported version of Affinitomics for Wordpress. It has been replaced by ai•mojo! =
 
 [“ai•mojo” (free, by Prefrent)] (https://wordpress.org/plugins/aimojo/)Affinitomics™ transforms Wordpress into a hyper-relevant, context aware and intelligent powerhouse in minutes.
 
@@ -104,6 +104,10 @@ So 1000 archetypes could be 50 pages, 900 posts, and 50 ads if you didn’t assi
 
 == Changelog ==
 
+=0.9.7.1=
+* Migration path
+* Improved documentation
+
 =0.9.7=
 * Improved legacy support
 
@@ -173,7 +177,7 @@ So 1000 archetypes could be 50 pages, 900 posts, and 50 ads if you didn’t assi
 
 == Upgrade Notice ==
 
-= 0.9.0 =
+= 0.9.7.1 =
 Upgrade - GPLv2 license, Affinitomics™ Cloud storage improvements, speed enhancements, taxonomy converter integration.
 
 == Additional Information ==
