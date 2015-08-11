@@ -1,43 +1,9 @@
 Plugin Name: Affinitomics
-Author: Hans Hauge, Joe Wilson, Rob Hust (Prefrent).
+Author: Joe Wilson, Rob Hust (Prefrent).
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
-
-0.9.7.1
-----------------------------------------------------------------------
-- included migration path
-- documentation fixes
-
-0.9.7
-----------------------------------------------------------------------
-- improved legacy support
-
-0.9.6
-----------------------------------------------------------------------
-- Changed how plugin syncs with cloud to resolve 502 error for large collections
-- Included anonymous API key support
-- Added registration with Affinitomics.com
-
-0.9.0
-----------------------------------------------------------------------
-- Corrected issue syncing with cloud
-- Fixed bug related to implementation of CSE
-
-0.7.0
-----------------------------------------------------------------------
-- CSS Styling hooks!
-- Support for WooCommerce!
-
-0.6.06
-----------------------------------------------------------------------
-- Changes to internal documentation
-- Other little bug fixes/improvements
-
-0.6.05
-----------------------------------------------------------------------
-- Corrections in readme.txt and documentation
 
 0.6.04
 ----------------------------------------------------------------------

@@ -3,7 +3,7 @@
 Plugin Name: Affinitomics
 Plugin URI: http://prefrent.com
 Description: Apply Affinitomic Descriptors, Draws, and Distance to Posts and Pages.  Shortcode to display Affinitomic relationships. Google CSE with Affinitomics.
-Version: 0.9.7.1
+Version: 1.0.1
 Author: Prefrent
 Author URI: http://prefrent.com
 */
@@ -28,6 +28,13 @@ Copyright (C) 2014 Prefrent
 // | Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,               |
 // | MA 02110-1301 USA                                                    |
 // +----------------------------------------------------------------------+
+define( 'AFFINITOMICS__VERSION', '1.0.1' );
+define( 'AFFINITOMICS__TYPE', 'affinitomics_wp' );
+define( 'AFFINITOMICS__MINIMUM_WP_VERSION', '3.5' );
+define( 'AFFINITOMICS__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'AFFINITOMICS__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
+
 
 wp_enqueue_style( 'afpost-style', plugins_url('affinitomics.css', __FILE__) );
 
@@ -39,6 +46,10 @@ add_action( 'save_post', 'afpost_save_postdata' );
 global $afview_count;
 $afview_count = 0;
 add_action( 'init', 'my_script_enqueuer' );
+
+// add an admin notice if aimojo isn't setup
+add_action( is_network_admin() ? 'network_admin_notices' : 'admin_notices',  'display_notice'  );
+
 
 function my_script_enqueuer() {
    wp_register_script( "affinitomics_ajax_script", WP_PLUGIN_URL.'/affinitomics/affinitomics_ajax_script.js', array('jquery') );
@@ -97,7 +108,7 @@ function af_check_for_errors(){
 }
 
 function af_verify_provider(){
-  update_option( 'af_cloud_url' , 'vast-savannah-3299.herokuapp.com' );
+  update_option( 'af_cloud_url' , 'www.affinitomics.com' );
 }
 
 /* Save Custom DATA */
@@ -581,6 +592,11 @@ function af_plugin_options() {
     wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
   }
 
+      if ( isset( $_GET['dismissNotice'] ) )
+      {
+        update_option( 'af_banner_notice_dismissed' , 'true' );  
+      }
+
   af_verify_key();
   echo '<div class="wrap">';
   echo '<h2>Affinitomics Plugin Settings</h2>';
@@ -738,6 +754,46 @@ function af_register_settings() {
   register_setting('af-settings-group', 'af_error_code');
   register_setting('af-cloud-settings-group', 'af_cloudify');
 }
+
+
+function extraView( $name, array $args = array() ) 
+{
+  $args = apply_filters( 'affinitomics_view_arguments', $args, $name );
+
+  foreach ( $args AS $key => $val ) 
+  {
+    $$key = $val;
+  }
+
+  load_plugin_textdomain( 'affinitomics' );
+ 
+  $file = AFFINITOMICS__PLUGIN_DIR . 'views/'. $name . '.php';
+
+  include( $file );
+}
+
+function display_notice() 
+{
+
+  // only show notice if we're either a super admin on a network or an admin on a single site
+  $show_notice = current_user_can( 'manage_network_plugins' ) || ( ! is_multisite() && current_user_can( 'install_plugins' ) );
+
+  if ( !$show_notice )
+    return;
+
+  $dismissed = get_option( 'af_banner_notice_dismissed', '' );
+  if ($dismissed != 'true')
+  {
+    $registerLink = 'http://aimojo.com';
+    $postOptionsUrl = 'edit.php?post_type=archetype&page=affinitomics&dismissNotice=1';
+    $bannerImage = 'upgrade-to-aimojo-mod.jpg';
+
+
+    extraView( 'notice', array( 'bannerLink' => $registerLink, 'postOptionsUrl' => $postOptionsUrl, 'bannerImage' => $bannerImage ) );
+
+  }
+}
+
 
 /*
 ----------------------------------------------------------------------
